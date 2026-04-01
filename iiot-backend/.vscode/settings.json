@@ -1,0 +1,8 @@
+{
+      "files.trimTrailingWhitespace": false,
+      "editor.overtypeOnPaste": false,
+      "editor.autoClosingOvertype": "auto",
+      "workbench.tree.renderIndentGuides": "always",
+      "workbench.tree.indent": 10,
+      "editor.autoIndentOnPaste": true
+}

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: iiot_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user_iiot
+      POSTGRES_PASSWORD: securepassword
+      POSTGRES_DB: iiot_events_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: iiot_influx
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin_user
+      DOCKER_INFLUXDB_INIT_PASSWORD: strongpassword
+      DOCKER_INFLUXDB_INIT_ORG: ChestaCorp
+      DOCKER_INFLUXDB_INIT_BUCKET: iiot_raw_data
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: 98aWAgEFGJqIZXGrmRr1IQe47TkquE5QMpWapB_gmiyTf8vs6st8chDg1G0ua_RpfI3hLtu4RgpDMjUibEef8A==
+    restart: always
+
+  backend:
+    build: .
+    container_name: iiot_backend_server
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "3005:3005"
+    volumes:
+      - .:/usr/src/app 
+      - /usr/src/app/node_modules 
+    depends_on:
+      - influxdb
+      - postgres
+    environment:
+      POSTGRES_HOST: postgres  
+      INFLUX_HOST: influxdb
+      INFLUX_TOKEN: 98aWAgEFGJqIZXGrmRr1IQe47TkquE5QMpWapB_gmiyTf8vs6st8chDg1G0ua_RpfI3hLtu4RgpDMjUibEef8A==
+    restart: always
+
+volumes:
+  postgres_data:
+  influxdb_data:
