@@ -1,18 +1,22 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserEntity } from 'src/database/entities/user/user.entity';
 import { JwtStartegy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
       imports: [
+            ConfigModule,
             PassportModule.register({ defaultStrategy: 'jwt' }),
-            JwtModule.register({
-                  secret: 'RAHASIA_KITA_BERSAMA', // Ganti pake string random lah nanti
-                  signOptions: { expiresIn: '1d' }, // Token hangus dalam 1 hari
+            JwtModule.registerAsync({
+                  imports: [ConfigModule],
+                  inject: [ConfigService],
+                  useFactory: (configService: ConfigService) => ({
+                        secret: configService.get<string>('JWT_SECRET', 'RAHASIA_KITA_BERSAMA'),
+                        signOptions: { expiresIn: '1d' },
+                  }),
             }),
       ],
       providers: [AuthService, JwtStartegy],

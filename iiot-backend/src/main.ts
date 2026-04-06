@@ -1,14 +1,15 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptors } from './common/interceptors/logging-interceptors';
 import { ValidationPipe } from '@nestjs/common';
-import { warn } from 'console';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug'],
   });
+  const configService = app.get(ConfigService);
 
   // Function ini si agar DTO bekerja otomatis
   app.useGlobalPipes(new ValidationPipe({
@@ -41,7 +42,7 @@ async function bootstrap() {
 
   
   // Start Application
-  const port = 3006;
+  const port = Number(configService.get<string>('PORT', '3006'));
   await app.listen(port);
 
   console.log(`🚀 Backend IIOT AQUA is running on: http://localhost:${port}/api`);

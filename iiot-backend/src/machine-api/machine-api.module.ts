@@ -6,7 +6,6 @@ import { MachineAnalyticsController } from './machine-analytics/machine-analytic
 import { CoreEngineModule } from 'src/core-engine/core-engine.module';
 import { BreakdownEventEntity } from 'src/database/entities/breakdown-event/breakdown-event.entity';
 import { InfluxAnalyticsService } from 'src/database/influx/influx-analytics.service';
-import { InfluxService } from 'src/database/influx/influx.service';
 import { MachineHistoryService } from './machine-history/machine-history.service';
 import { AuthModule } from 'src/auth/auth.module';
 
@@ -25,8 +24,7 @@ import { AuthModule } from 'src/auth/auth.module';
     providers: [
       MachineTelemetryGateway,
       MachineHistoryService,
-      InfluxAnalyticsService,
-      InfluxService
+      InfluxAnalyticsService
   ],
   exports: [MachineTelemetryGateway, MachineHistoryService],
 })

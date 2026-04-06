@@ -2,7 +2,6 @@ import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BreakdownEventEntity } from './entities/breakdown-event/breakdown-event.entity';
-import { Type } from 'class-transformer';
 import { InfluxService } from './influx/influx.service';
 import { UserEntity } from './entities/user/user.entity';
 
@@ -15,19 +14,17 @@ import { UserEntity } from './entities/user/user.entity';
                   inject: [ConfigService],
                   useFactory: (configService: ConfigService) => ({
                         type: 'postgres',
-                        host: 'localhost',
-                        port: 5432,
-                        username: 'user_iiot',      
-                        password: 'securepassword',
-                        database: 'iiot_events_db',
-                        // Array entities akan diisi di langkah berikut nya
+                        host: configService.get<string>('DB_HOST', 'localhost'),
+                        port: Number(configService.get<string>('DB_PORT', '5432')),
+                        username: configService.get<string>('DB_USERNAME', 'postgres'),
+                        password: configService.get<string>('DB_PASSWORD', 'postgres'),
+                        database: configService.get<string>('DB_NAME', 'iiot_events_db'),
                         entities: [
                               UserEntity,
                               BreakdownEventEntity,
                         ],
-                        // PENTING: Untuk development, agar schema di buat otomatis
                         synchronize: true,
-                        dropSchema: true,
+                        dropSchema: false,
                   }),
             }),
             // Daftarkan Entity agar Modul lain bisa menggunakan nya

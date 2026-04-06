@@ -5,20 +5,33 @@ import { InfluxDB, Point, WriteApi } from '@influxdata/influxdb-client';
 @Injectable()
 export class InfluxService implements OnModuleInit {
       private readonly logger = new Logger(InfluxService.name);
-      private influxDB: InfluxDB;
-      private writeApi: WriteApi;
+      private influxDB?: InfluxDB;
+      private writeApi?: WriteApi;
+      private enabled = false;
 
       getBucket(): string {
-            return 'iiot_raw_data';
+            return this.configService.get<string>('INFLUX_BUCKET', 'iiot_raw_data');
       }
 
       getQueryApi() {
-            return this.influxDB.getQueryApi('ChestaCorp'); 
+            if (!this.enabled || !this.influxDB) {
+                  return null;
+            }
+
+            return this.influxDB.getQueryApi(this.configService.get<string>('INFLUX_ORG', 'ChestaCorp'));
       }
 
       constructor(private configService: ConfigService) { }
       
       onModuleInit() {
+            const enabled = this.configService.get<string>('INFLUX_ENABLED', 'false');
+            this.enabled = enabled === 'true';
+
+            if (!this.enabled) {
+                  this.logger.warn('InfluxDB integration disabled via INFLUX_ENABLED=false');
+                  return;
+            }
+
             // Ambil dari environment variable (docker-compose / .env)
             const url = this.configService.get<string>('INFLUX_URL') || 'http://influxdb:8086';
             const token = this.configService.get<string>('INFLUX_TOKEN');
@@ -36,6 +49,10 @@ export class InfluxService implements OnModuleInit {
        */
 
       async writePoint(machineId: string, status: number, counter: number, alarm: number, shiftName: string) {
+            if (!this.enabled || !this.writeApi) {
+                  return;
+            }
+
             try {
                   const point = new Point('machine_telemetry')
                         .tag('machineId', machineId)
@@ -58,6 +75,8 @@ export class InfluxService implements OnModuleInit {
 
       // PENTING: Tutup koneksi saat aplikasi mati
       async onMOoduleDestroy() {
-            await this.writeApi.close();
+            if (this.writeApi) {
+                  await this.writeApi.close();
+            }
       }
 }
