@@ -1,0 +1,506 @@
+diff --git a/iiot-backend/package-lock.json b/iiot-backend/package-lock.json
+index cfb7570..b7a27d0 100644
+--- a/iiot-backend/package-lock.json
++++ b/iiot-backend/package-lock.json
+@@ -238,7 +238,6 @@
+       "integrity": "sha512-e7jT4DxYvIDLk1ZHmU/m/mB19rex9sv0c2ftBtjSBv+kVM/902eh0fINUzD7UwLLNR+jU585GxUJ8/EBfAM5fw==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@babel/code-frame": "^7.27.1",
+         "@babel/generator": "^7.28.5",
+@@ -2156,7 +2155,6 @@
+       "resolved": "https://registry.npmjs.org/@nestjs/common/-/common-11.1.9.tgz",
+       "integrity": "sha512-zDntUTReRbAThIfSp3dQZ9kKqI+LjgLp5YZN5c1bgNRDuoeLySAoZg46Bg1a+uV8TMgIRziHocglKGNzr6l+bQ==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "file-type": "21.1.0",
+         "iterare": "1.2.1",
+@@ -2210,7 +2208,6 @@
+       "integrity": "sha512-a00B0BM4X+9z+t3UxJqIZlemIwCQdYoPKrMcM+ky4z3pkqqG1eTWexjs+YXpGObnLnjtMPVKWlcZHp3adDYvUw==",
+       "hasInstallScript": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@nuxt/opencollective": "0.4.1",
+         "fast-safe-stringify": "2.1.1",
+@@ -2294,7 +2291,6 @@
+       "resolved": "https://registry.npmjs.org/@nestjs/platform-express/-/platform-express-11.1.9.tgz",
+       "integrity": "sha512-GVd3+0lO0mJq2m1kl9hDDnVrX3Nd4oH3oDfklz0pZEVEVS0KVSp63ufHq2Lu9cyPdSBuelJr9iPm2QQ1yX+Kmw==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "cors": "2.8.5",
+         "express": "5.1.0",
+@@ -2316,7 +2312,6 @@
+       "resolved": "https://registry.npmjs.org/@nestjs/platform-socket.io/-/platform-socket.io-11.1.9.tgz",
+       "integrity": "sha512-OaAW+voXo5BXbFKd9Ot3SL05tEucRMhZRdw5wdWZf/RpIl9hB6G6OHr8DDxNbUGvuQWzNnZHCDHx3EQJzjcIyA==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "socket.io": "4.8.1",
+         "tslib": "2.8.1"
+@@ -2508,7 +2503,6 @@
+       "resolved": "https://registry.npmjs.org/@nestjs/websockets/-/websockets-11.1.9.tgz",
+       "integrity": "sha512-kkkdeTVcc3X7ZzvVqUVpOAJoh49kTRUjWNUXo5jmG+27OvZoHfs/vuSiqxidrrbIgydSqN15HUsf1wZwQUrxCQ==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "iterare": "1.2.1",
+         "object-hash": "3.0.0",
+@@ -2796,7 +2790,6 @@
+       "integrity": "sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@types/estree": "*",
+         "@types/json-schema": "*"
+@@ -2925,7 +2918,6 @@
+       "resolved": "https://registry.npmjs.org/@types/node/-/node-22.19.3.tgz",
+       "integrity": "sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "undici-types": "~6.21.0"
+       }
+@@ -3106,7 +3098,6 @@
+       "integrity": "sha512-6/cmF2piao+f6wSxUsJLZjck7OQsYyRtcOZS02k7XINSNlz93v6emM8WutDQSXnroG2xwYlEVHJI+cPA7CPM3Q==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@typescript-eslint/scope-manager": "8.50.0",
+         "@typescript-eslint/types": "8.50.0",
+@@ -3788,7 +3779,6 @@
+       "integrity": "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==",
+       "devOptional": true,
+       "license": "MIT",
+-      "peer": true,
+       "bin": {
+         "acorn": "bin/acorn"
+       },
+@@ -3838,7 +3828,6 @@
+       "integrity": "sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "fast-deep-equal": "^3.1.1",
+         "fast-json-stable-stringify": "^2.0.0",
+@@ -4290,7 +4279,6 @@
+         }
+       ],
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "baseline-browser-mapping": "^2.9.0",
+         "caniuse-lite": "^1.0.30001759",
+@@ -4513,7 +4501,6 @@
+       "integrity": "sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "readdirp": "^4.0.1"
+       },
+@@ -4561,15 +4548,13 @@
+       "version": "0.5.1",
+       "resolved": "https://registry.npmjs.org/class-transformer/-/class-transformer-0.5.1.tgz",
+       "integrity": "sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw==",
+-      "license": "MIT",
+-      "peer": true
++      "license": "MIT"
+     },
+     "node_modules/class-validator": {
+       "version": "0.14.3",
+       "resolved": "https://registry.npmjs.org/class-validator/-/class-validator-0.14.3.tgz",
+       "integrity": "sha512-rXXekcjofVN1LTOSw+u4u9WXVEUvNBVjORW154q/IdmYWy1nMbOU9aNtZB0t8m+FJQ9q91jlr2f9CwwUFdFMRA==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@types/validator": "^13.15.3",
+         "libphonenumber-js": "^1.11.1",
+@@ -5355,7 +5340,6 @@
+       "integrity": "sha512-LEyamqS7W5HB3ujJyvi0HQK/dtVINZvd5mAAp9eT5S/ujByGjiZLCzPcHVzuXbpJDJF/cxwHlfceVUDZ2lnSTw==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@eslint-community/eslint-utils": "^4.8.0",
+         "@eslint-community/regexpp": "^4.12.1",
+@@ -5416,7 +5400,6 @@
+       "integrity": "sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "bin": {
+         "eslint-config-prettier": "bin/cli.js"
+       },
+@@ -5649,7 +5632,6 @@
+       "resolved": "https://registry.npmjs.org/express/-/express-5.1.0.tgz",
+       "integrity": "sha512-DT9ck5YIRU+8GYzzU5kT3eHGA5iL+1Zd0EutOmTE9Dtk+Tvuzd23VBU+ec7HPNSTxXYO55gPV/hq4pSBJDjFpA==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "accepts": "^2.0.0",
+         "body-parser": "^2.2.0",
+@@ -6719,7 +6701,6 @@
+       "integrity": "sha512-F26gjC0yWN8uAA5m5Ss8ZQf5nDHWGlN/xWZIh8S5SRbsEKBovwZhxGd6LJlbZYxBgCYOtreSUyb8hpXyGC5O4A==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@jest/core": "30.2.0",
+         "@jest/types": "30.2.0",
+@@ -8423,7 +8404,6 @@
+       "resolved": "https://registry.npmjs.org/passport/-/passport-0.7.0.tgz",
+       "integrity": "sha512-cPLl+qZpSc+ireUvt+IzqbED1cHHkDoVYMo30jbJIdOOjQ1MQYZBPiNvmi8UM6lJuOpTPXJGZQk0DtC4y61MYQ==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "passport-strategy": "1.x.x",
+         "pause": "0.0.1",
+@@ -8541,7 +8521,6 @@
+       "resolved": "https://registry.npmjs.org/pg/-/pg-8.16.3.tgz",
+       "integrity": "sha512-enxc1h0jA/aq5oSDMvqyW3q89ra6XIIDZgCX9vkMrnz5DFTw/Ny3Li2lFQ+pt3L6MCgm/5o2o8HW9hiJji+xvw==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "pg-connection-string": "^2.9.1",
+         "pg-pool": "^3.10.1",
+@@ -8799,7 +8778,6 @@
+       "integrity": "sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "bin": {
+         "prettier": "bin/prettier.cjs"
+       },
+@@ -8979,8 +8957,7 @@
+       "version": "0.2.2",
+       "resolved": "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.2.2.tgz",
+       "integrity": "sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==",
+-      "license": "Apache-2.0",
+-      "peer": true
++      "license": "Apache-2.0"
+     },
+     "node_modules/require-directory": {
+       "version": "2.1.1",
+@@ -9076,7 +9053,6 @@
+       "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz",
+       "integrity": "sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==",
+       "license": "Apache-2.0",
+-      "peer": true,
+       "dependencies": {
+         "tslib": "^2.1.0"
+       }
+@@ -9879,7 +9855,6 @@
+       "integrity": "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "fast-deep-equal": "^3.1.3",
+         "fast-uri": "^3.0.1",
+@@ -10221,7 +10196,6 @@
+       "integrity": "sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==",
+       "devOptional": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@cspotcode/source-map-support": "^0.8.0",
+         "@tsconfig/node10": "^1.0.7",
+@@ -10382,7 +10356,6 @@
+       "resolved": "https://registry.npmjs.org/typeorm/-/typeorm-0.3.28.tgz",
+       "integrity": "sha512-6GH7wXhtfq2D33ZuRXYwIsl/qM5685WZcODZb7noOOcRMteM9KF2x2ap3H0EBjnSV0VO4gNAfJT5Ukp0PkOlvg==",
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@sqltools/formatter": "^1.2.5",
+         "ansis": "^4.2.0",
+@@ -10588,7 +10561,6 @@
+       "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+       "devOptional": true,
+       "license": "Apache-2.0",
+-      "peer": true,
+       "bin": {
+         "tsc": "bin/tsc",
+         "tsserver": "bin/tsserver"
+@@ -10868,7 +10840,6 @@
+       "integrity": "sha512-HU1JOuV1OavsZ+mfigY0j8d1TgQgbZ6M+J75zDkpEAwYeXjWSqrGJtgnPblJjd/mAyTNQ7ygw0MiKOn6etz8yw==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "@types/eslint-scope": "^3.7.7",
+         "@types/estree": "^1.0.8",
+@@ -10938,7 +10909,6 @@
+       "integrity": "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==",
+       "dev": true,
+       "license": "MIT",
+-      "peer": true,
+       "dependencies": {
+         "fast-deep-equal": "^3.1.3",
+         "fast-uri": "^3.0.1",
+diff --git a/iiot-backend/src/auth/auth.module.ts b/iiot-backend/src/auth/auth.module.ts
+index d735d87..3dc473b 100644
+--- a/iiot-backend/src/auth/auth.module.ts
++++ b/iiot-backend/src/auth/auth.module.ts
+@@ -1,18 +1,22 @@
+ import { Module } from '@nestjs/common';
++import { ConfigModule, ConfigService } from '@nestjs/config';
+ import { JwtModule } from '@nestjs/jwt';
+-import { TypeOrmModule } from '@nestjs/typeorm';
+ import { AuthService } from './auth.service';
+ import { AuthController } from './auth.controller';
+-import { UserEntity } from 'src/database/entities/user/user.entity';
+ import { JwtStartegy } from './jwt.strategy';
+ import { PassportModule } from '@nestjs/passport';
+ 
+ @Module({
+       imports: [
++            ConfigModule,
+             PassportModule.register({ defaultStrategy: 'jwt' }),
+-            JwtModule.register({
+-                  secret: 'RAHASIA_KITA_BERSAMA', // Ganti pake string random lah nanti
+-                  signOptions: { expiresIn: '1d' }, // Token hangus dalam 1 hari
++            JwtModule.registerAsync({
++                  imports: [ConfigModule],
++                  inject: [ConfigService],
++                  useFactory: (configService: ConfigService) => ({
++                        secret: configService.get<string>('JWT_SECRET', 'RAHASIA_KITA_BERSAMA'),
++                        signOptions: { expiresIn: '1d' },
++                  }),
+             }),
+       ],
+       providers: [AuthService, JwtStartegy],
+diff --git a/iiot-backend/src/auth/jwt.strategy.ts b/iiot-backend/src/auth/jwt.strategy.ts
+index 60d14a3..28feb7c 100644
+--- a/iiot-backend/src/auth/jwt.strategy.ts
++++ b/iiot-backend/src/auth/jwt.strategy.ts
+@@ -1,14 +1,15 @@
+ import { ExtractJwt, Strategy } from "passport-jwt";
+ import { PassportStrategy } from "@nestjs/passport";
+ import { Injectable } from "@nestjs/common";
++import { ConfigService } from "@nestjs/config";
+ 
+ @Injectable()
+ export class JwtStartegy extends PassportStrategy(Strategy) {
+-      constructor() {
++      constructor(configService: ConfigService) {
+             super({
+                   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+                   ignoreExpiration: false,
+-                  secretOrKey: 'RAHASIA_KITA_BERSAMA', // Harus sama dengan di AuthModule
++                  secretOrKey: configService.get<string>('JWT_SECRET', 'RAHASIA_KITA_BERSAMA'),
+             });
+       }
+ 
+@@ -18,4 +19,4 @@ export class JwtStartegy extends PassportStrategy(Strategy) {
+             return { userId: payload.sub, username: payload.username, role: payload.role }; 
+             
+       }
+-}
+\ No newline at end of file
++}
+diff --git a/iiot-backend/src/database/database.module.ts b/iiot-backend/src/database/database.module.ts
+index f355e91..cfdcbd4 100644
+--- a/iiot-backend/src/database/database.module.ts
++++ b/iiot-backend/src/database/database.module.ts
+@@ -2,7 +2,6 @@ import { Global, Module } from '@nestjs/common';
+ import { TypeOrmModule } from '@nestjs/typeorm';
+ import { ConfigModule, ConfigService } from '@nestjs/config';
+ import { BreakdownEventEntity } from './entities/breakdown-event/breakdown-event.entity';
+-import { Type } from 'class-transformer';
+ import { InfluxService } from './influx/influx.service';
+ import { UserEntity } from './entities/user/user.entity';
+ 
+@@ -15,19 +14,17 @@ import { UserEntity } from './entities/user/user.entity';
+                   inject: [ConfigService],
+                   useFactory: (configService: ConfigService) => ({
+                         type: 'postgres',
+-                        host: 'localhost',
+-                        port: 5432,
+-                        username: 'user_iiot',      
+-                        password: 'securepassword',
+-                        database: 'iiot_events_db',
+-                        // Array entities akan diisi di langkah berikut nya
++                        host: configService.get<string>('DB_HOST', 'localhost'),
++                        port: Number(configService.get<string>('DB_PORT', '5432')),
++                        username: configService.get<string>('DB_USERNAME', 'postgres'),
++                        password: configService.get<string>('DB_PASSWORD', 'postgres'),
++                        database: configService.get<string>('DB_NAME', 'iiot_events_db'),
+                         entities: [
+                               UserEntity,
+                               BreakdownEventEntity,
+                         ],
+-                        // PENTING: Untuk development, agar schema di buat otomatis
+                         synchronize: true,
+-                        dropSchema: true,
++                        dropSchema: false,
+                   }),
+             }),
+             // Daftarkan Entity agar Modul lain bisa menggunakan nya
+diff --git a/iiot-backend/src/database/influx/influx-analytics.service.ts b/iiot-backend/src/database/influx/influx-analytics.service.ts
+index 2ffe112..214ab54 100644
+--- a/iiot-backend/src/database/influx/influx-analytics.service.ts
++++ b/iiot-backend/src/database/influx/influx-analytics.service.ts
+@@ -24,6 +24,12 @@ export class InfluxAnalyticsService {
+             range: string = '-24h',
+             window: string = '1h'
+       ): Promise<ProductionDataPoint[]> {
++            const queryApi = this.influxBase.getQueryApi();
++
++            if (!queryApi) {
++                  this.logger.warn('InfluxDB is disabled or unavailable; returning empty trend data.');
++                  return [];
++            }
+ 
+             // Query Flux yang lebih dinamis dan rapi
+             const fluxQuery = `
+@@ -39,7 +45,6 @@ export class InfluxAnalyticsService {
+ 
+ 
+             try {
+-                  const queryApi = this.influxBase.getQueryApi();
+                   const results: ProductionDataPoint[] = [];
+ 
+                   return new Promise((resolve, reject) => {
+@@ -65,4 +70,4 @@ export class InfluxAnalyticsService {
+                   return [];
+             }
+       }
+-}
+\ No newline at end of file
++}
+diff --git a/iiot-backend/src/database/influx/influx.service.ts b/iiot-backend/src/database/influx/influx.service.ts
+index e06ebe0..ef39fe2 100644
+--- a/iiot-backend/src/database/influx/influx.service.ts
++++ b/iiot-backend/src/database/influx/influx.service.ts
+@@ -5,20 +5,33 @@ import { InfluxDB, Point, WriteApi } from '@influxdata/influxdb-client';
+ @Injectable()
+ export class InfluxService implements OnModuleInit {
+       private readonly logger = new Logger(InfluxService.name);
+-      private influxDB: InfluxDB;
+-      private writeApi: WriteApi;
++      private influxDB?: InfluxDB;
++      private writeApi?: WriteApi;
++      private enabled = false;
+ 
+       getBucket(): string {
+-            return 'iiot_raw_data';
++            return this.configService.get<string>('INFLUX_BUCKET', 'iiot_raw_data');
+       }
+ 
+       getQueryApi() {
+-            return this.influxDB.getQueryApi('ChestaCorp'); 
++            if (!this.enabled || !this.influxDB) {
++                  return null;
++            }
++
++            return this.influxDB.getQueryApi(this.configService.get<string>('INFLUX_ORG', 'ChestaCorp'));
+       }
+ 
+       constructor(private configService: ConfigService) { }
+       
+       onModuleInit() {
++            const enabled = this.configService.get<string>('INFLUX_ENABLED', 'false');
++            this.enabled = enabled === 'true';
++
++            if (!this.enabled) {
++                  this.logger.warn('InfluxDB integration disabled via INFLUX_ENABLED=false');
++                  return;
++            }
++
+             // Ambil dari environment variable (docker-compose / .env)
+             const url = this.configService.get<string>('INFLUX_URL') || 'http://influxdb:8086';
+             const token = this.configService.get<string>('INFLUX_TOKEN');
+@@ -36,6 +49,10 @@ export class InfluxService implements OnModuleInit {
+        */
+ 
+       async writePoint(machineId: string, status: number, counter: number, alarm: number, shiftName: string) {
++            if (!this.enabled || !this.writeApi) {
++                  return;
++            }
++
+             try {
+                   const point = new Point('machine_telemetry')
+                         .tag('machineId', machineId)
+@@ -58,6 +75,8 @@ export class InfluxService implements OnModuleInit {
+ 
+       // PENTING: Tutup koneksi saat aplikasi mati
+       async onMOoduleDestroy() {
+-            await this.writeApi.close();
++            if (this.writeApi) {
++                  await this.writeApi.close();
++            }
+       }
+ }
+diff --git a/iiot-backend/src/machine-api/machine-api.module.ts b/iiot-backend/src/machine-api/machine-api.module.ts
+index f1bf1a3..b9a3dfa 100644
+--- a/iiot-backend/src/machine-api/machine-api.module.ts
++++ b/iiot-backend/src/machine-api/machine-api.module.ts
+@@ -6,7 +6,6 @@ import { MachineAnalyticsController } from './machine-analytics/machine-analytic
+ import { CoreEngineModule } from 'src/core-engine/core-engine.module';
+ import { BreakdownEventEntity } from 'src/database/entities/breakdown-event/breakdown-event.entity';
+ import { InfluxAnalyticsService } from 'src/database/influx/influx-analytics.service';
+-import { InfluxService } from 'src/database/influx/influx.service';
+ import { MachineHistoryService } from './machine-history/machine-history.service';
+ import { AuthModule } from 'src/auth/auth.module';
+ 
+@@ -25,8 +24,7 @@ import { AuthModule } from 'src/auth/auth.module';
+     providers: [
+       MachineTelemetryGateway,
+       MachineHistoryService,
+-      InfluxAnalyticsService,
+-      InfluxService
++      InfluxAnalyticsService
+   ],
+   exports: [MachineTelemetryGateway, MachineHistoryService],
+ })
+diff --git a/iiot-backend/src/machine-api/machine-telemetry/machine-telemetry.gateway.ts b/iiot-backend/src/machine-api/machine-telemetry/machine-telemetry.gateway.ts
+index 98f269b..bd6eaa3 100644
+--- a/iiot-backend/src/machine-api/machine-telemetry/machine-telemetry.gateway.ts
++++ b/iiot-backend/src/machine-api/machine-telemetry/machine-telemetry.gateway.ts
+@@ -8,7 +8,7 @@ import {
+ import { Server } from 'socket.io';
+ import { InfluxService } from 'src/database/influx/influx.service';
+ 
+-@WebSocketGateway(3005, {
++@WebSocketGateway({
+   cors: {
+     origin: '*', // DI produksi, ganti dengan domain frontend
+   },
+diff --git a/iiot-backend/src/main.ts b/iiot-backend/src/main.ts
+index c8b7d84..316a6b2 100644
+--- a/iiot-backend/src/main.ts
++++ b/iiot-backend/src/main.ts
+@@ -1,14 +1,15 @@
+ import { NestFactory } from '@nestjs/core';
++import { ConfigService } from '@nestjs/config';
+ import { AppModule } from './app.module';
+ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+ import { LoggingInterceptors } from './common/interceptors/logging-interceptors';
+ import { ValidationPipe } from '@nestjs/common';
+-import { warn } from 'console';
+ 
+ async function bootstrap() {
+   const app = await NestFactory.create(AppModule, {
+     logger: ['log', 'error', 'warn', 'debug'],
+   });
++  const configService = app.get(ConfigService);
+ 
+   // Function ini si agar DTO bekerja otomatis
+   app.useGlobalPipes(new ValidationPipe({
+@@ -41,7 +42,7 @@ async function bootstrap() {
+ 
+   
+   // Start Application
+-  const port = 3006;
++  const port = Number(configService.get<string>('PORT', '3006'));
+   await app.listen(port);
+ 
+   console.log(`🚀 Backend IIOT AQUA is running on: http://localhost:${port}/api`);

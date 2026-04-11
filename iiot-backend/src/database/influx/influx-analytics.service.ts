@@ -24,6 +24,12 @@ export class InfluxAnalyticsService {
             range: string = '-24h',
             window: string = '1h'
       ): Promise<ProductionDataPoint[]> {
+            const queryApi = this.influxBase.getQueryApi();
+
+            if (!queryApi) {
+                  this.logger.warn('InfluxDB is disabled or unavailable; returning empty trend data.');
+                  return [];
+            }
 
             // Query Flux yang lebih dinamis dan rapi
             const fluxQuery = `
@@ -39,7 +45,6 @@ export class InfluxAnalyticsService {
 
 
             try {
-                  const queryApi = this.influxBase.getQueryApi();
                   const results: ProductionDataPoint[] = [];
 
                   return new Promise((resolve, reject) => {

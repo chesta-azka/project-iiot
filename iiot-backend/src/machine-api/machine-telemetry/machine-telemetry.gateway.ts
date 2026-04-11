@@ -8,7 +8,7 @@ import {
 import { Server } from 'socket.io';
 import { InfluxService } from 'src/database/influx/influx.service';
 
-@WebSocketGateway(3005, {
+@WebSocketGateway({
   cors: {
     origin: '*', // DI produksi, ganti dengan domain frontend
   },
