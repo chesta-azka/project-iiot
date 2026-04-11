@@ -130,7 +130,7 @@ export default function DashboardPage() {
                 <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Machine Unit</th>
                 <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Operation</th>
                 <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Production</th>
-                <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Up-Time</th>
+                <th className="p-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Down-Time</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">

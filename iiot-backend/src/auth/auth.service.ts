@@ -1,18 +1,17 @@
 import {
       Injectable,
       UnauthorizedException,
-      ConflictException,
-      InternalServerErrorException,
-      Logger
+      Logger,
+      OnApplicationBootstrap
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserEntity, UserRole } from '../database/entities/user/user.entity';
+import { UserEntity, UserRole } from '../database/entities/user/user.entity'; // Pastikan path ini sesuai
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnApplicationBootstrap {
       private readonly logger = new Logger(AuthService.name);
       private readonly SALT_ROUNDS = 10;
 
@@ -40,29 +39,6 @@ export class AuthService {
       }
 
       /**
-       * Registrasi dengan Proteksi Duplicate secara Elegan
-       */
-      async register(username: string, pass: string, role: UserRole) {
-            try {
-                  const hashedPassword = await bcrypt.hash(pass, this.SALT_ROUNDS);
-                  const newUser = this.userRepository.create({
-                        username,
-                        password: hashedPassword,
-                        role,
-                  });
-
-                  const { password, ...savedUser } = await this.userRepository.save(newUser);
-                  return savedUser;
-            } catch (error) {
-                  if (error.code === '23505') {
-                        throw new ConflictException('Username sudah digunakan');
-                  }
-                  this.logger.error(`Register Error: ${error.message}`);
-                  throw new InternalServerErrorException('Gagal memproses pendaftaran user');
-            }
-      }
-
-      /**
        * Helper Private untuk menjaga kode tetap DRY (Don't Repeat Yourself)
        */
       private generateToken(user: UserEntity) {
@@ -75,4 +51,39 @@ export class AuthService {
                   },
             };
       }
-    }
+
+      /**
+       * Fungsi ini otomatis jalan pas NestJS start
+       */
+      async onApplicationBootstrap() {
+            await this.seedUsers();
+      }
+
+      /**
+       * Fungsi untuk membuat user default (Admin, Engineer, Operator)
+       */
+      async seedUsers() {
+            // Asumsi UserRole adalah tipe Enum/String di Entity lu.
+            const defaultUsers = [
+                  { username: 'manager', role: UserRole.MANAGER },
+                  { username: 'supervisor', role: UserRole.SUPERVISOR },
+                  { username: 'operator', role: UserRole.OPERATOR },
+            ];
+
+            for (const u of defaultUsers) {
+                  const userExist = await this.userRepository.findOne({ where: { username: u.username } });
+
+                  if (!userExist) {
+                        const hashedPassword = await bcrypt.hash('AQUA123', this.SALT_ROUNDS);
+                        const newUser = this.userRepository.create({
+                              username: u.username,
+                              password: hashedPassword,
+                              role: u.role,
+                        });
+
+                        await this.userRepository.save(newUser);
+                        this.logger.log(`✅ Seeded default user: ${u.username} (Role: ${u.role})`);
+                  }
+            }
+      }
+}

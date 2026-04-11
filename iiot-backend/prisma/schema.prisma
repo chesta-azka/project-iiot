@@ -1,0 +1,55 @@
+// 1. Konfigurasi Generator & Datasource
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 2. TABLE MASTER MESIN (Mapping dari MODBUS)
+model Machine {
+  id           Int        @id @default(autoincrement())
+  machineId    String     @unique // Contoh: "AQ-BLW-01"
+  name         String
+  baseRegister Int        @unique // Offset 0, 100, 200, dll
+  status       Int        @default(0) // 1: RUN, 0: STOP
+  lastCounter  Int        @default(0)
+  lastTemp     Float      @default(0.0)
+
+  // Relasi ke Downtime
+  downtimes    Downtime[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+// 3. TABLE LOG DOWNTIME (Buat Operator & Supervisor)
+model Downtime {
+  id           Int       @id @default(autoincrement())
+  
+  // Relasi: Harus ada kolom ID (Int) dan field Model (Machine)
+  machineId    Int
+  machine      Machine   @relation(fields: [machineId], references: [id])
+
+  startTime    DateTime  @default(now())
+  endTime      DateTime?
+  duration     Int?      // Duration dalam detik
+
+  // Input Operator
+  reason       String?   // Contoh: "Reject", "Material Habis", "Maintenance"
+  operatorNote String?
+
+  // Validasi Supervisor
+  isApproved   Boolean   @default(false)
+  approvedBy   String?
+
+  createdAt    DateTime  @default(now())
+}
+
+// 4. TABLE SETTINGS / ALARM CONFIG (Opsional)
+model AlarmConfig {
+  id           Int      @id @default(autoincrement())
+  alarmCode    Int      @unique
+  description  String
+  severity     String   @default("CRITICAL") // CRITICAL, WARNING, INFO
+}

@@ -5,7 +5,7 @@ services:
     image: postgres:15
     container_name: iiot_postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: user_iiot
       POSTGRES_PASSWORD: securepassword
@@ -34,9 +34,10 @@ services:
     build: .
     container_name: iiot_backend_server
     ports:
-      - "3000:3000"
-      - "3001:3001"
-      - "3005:3005"
+      - "4000:3000"
+      - "4001:3001"
+      - "4005:3005"
+      - "4006:3006"
     volumes:
       - .:/usr/src/app 
       - /usr/src/app/node_modules 
