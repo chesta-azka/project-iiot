@@ -23,7 +23,7 @@ export class MachineHistoryController {
 
 
       @Get('history')
-      @Roles(UserRole.SUPERVISOR, UserRole.ADMIN)
+      @Roles(UserRole.SUPERVISOR, UserRole.MANAGER)
       @ApiOperation({ summary: 'Ambil daftar breakdown dengan pagination (Khusus Supervisor/Admin)' })
       @ApiResponse({ status: 200, description: 'Daftar history berhasil diambil' })
       // Kita menggunakan DTO secara penuh untuk kebersihan kode

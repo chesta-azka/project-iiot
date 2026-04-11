@@ -1,14 +1,19 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserEntity } from './entities/user/user.entity';
 import { BreakdownEventEntity } from './entities/breakdown-event/breakdown-event.entity';
 import { InfluxService } from './influx/influx.service';
-import { UserEntity } from './entities/user/user.entity';
 
+/**
+ * PROJECT IIOT - DATABASE MODULE (POV: GUA)
+ * Note buat diri sendiri: 
+ * Jangan ganti-ganti host manual lagi, udah gua bikin auto-detect!
+ */
 @Global()
 @Module({
       imports: [
-            // Konfigurasi TypeORM (PostgreSQL)
+            // 1. Setting TypeORM Async biar bisa baca .env
             TypeOrmModule.forRootAsync({
                   imports: [ConfigModule],
                   inject: [ConfigService],
@@ -27,11 +32,30 @@ import { UserEntity } from './entities/user/user.entity';
                         dropSchema: false,
                   }),
             }),
-            // Daftarkan Entity agar Modul lain bisa menggunakan nya
-            TypeOrmModule.forFeature([BreakdownEventEntity, UserEntity]),
+
+            // 2. Register Entity buat dipake di Service/Controller lain
+            TypeOrmModule.forFeature([
+                  UserEntity,
+                  BreakdownEventEntity
+            ]),
       ],
-      providers: [InfluxService],
-      // Export Module agar bisa di akases Core Engine nanti
-      exports: [TypeOrmModule.forFeature([BreakdownEventEntity, UserEntity]), InfluxService],
+
+      // InfluxDB masuk sini juga biar satu pintu urusan data
+      providers: [
+            InfluxService
+      ],
+
+      // Export semuanya biar modul kayak 'MachineModule' tinggal pake
+      exports: [
+            TypeOrmModule,
+            InfluxService
+      ],
 })
-export class DatabaseModule {}
+export class DatabaseModule {
+      constructor() {
+            // Log biar gua tau database udah ready pas startup
+            console.log('==============================================');
+            console.log('🚀 DATABASE MODULE: KONEKSI AMAN, GASSKEUN! ');
+            console.log('==============================================');
+      }
+}

@@ -29,7 +29,7 @@ export class MachineAnalyticsController {
          */
         @Get('dashboard-summary')
         @HttpCode(HttpStatus.OK)
-        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.ADMIN)
+        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.MANAGER)
         @ApiOperation({ summary: 'Ringkasan performa seluruh line produksi (Live + Stats)' })
         @ApiResponse({ status: 200, description: 'Summary data berhasil dikompilasi' })
         async getDashboardSummary() {
@@ -64,7 +64,7 @@ export class MachineAnalyticsController {
          * Mengambil data time-series dari InfluxDB untuk grafik (Chart.js/ApexCharts)
          */
         @Get('trend')
-        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.ADMIN)
+        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.MANAGER)
         @ApiOperation({ summary: 'Mendapatkan trend produksi/telemetri dari InfluxDB' })
         @ApiQuery({ name: 'machineId', required: true, example: 'FILLER-01' })
         @ApiQuery({ name: 'range', required: false, example: '-1h', description: 'Range waktu (e.g. -1h, -24h, -7d)' })

@@ -37,10 +37,10 @@ async function bootstrap() {
     .build()
   
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document); // Akses di https://localhost:3000/docs
+  SwaggerModule.setup('docs', app, document); // Akses di https://localhost:3006/docs
   // ------------------------------
 
-  
+
   // Start Application
   const port = Number(configService.get<string>('PORT', '3006'));
   await app.listen(port);
