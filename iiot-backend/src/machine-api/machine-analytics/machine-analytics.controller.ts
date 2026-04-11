@@ -76,4 +76,24 @@ export class MachineAnalyticsController {
                 this.logger.log(`Fetching trend analytics for: ${machineId}`);
                 return await this.influxAnalyticsService.getProductionTrend(machineId, range, window);
         }
+
+        /**
+         * MTBF (Mean Time Between Failures)
+         * Menghitung nilai keandalan mesin dalam 24 jam terakhir
+         */
+        @Get('mtbf')
+        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.MANAGER)
+        @ApiOperation({ summary: 'Mendapatkan metrik MTBF untuk 24 jam terakhir' })
+        @ApiQuery({ name: 'machineId', required: false, example: 'FILLER-01' })
+        @ApiResponse({ status: 200, description: 'Data MTBF berhasil dihitung' })
+        async getMTBF(
+                @Query('machineId') machineId?: string,
+        ) {
+                this.logger.log(`Calculating MTBF for: ${machineId || 'ALL_MACHINES'}`);
+                const data = await this.historyService.getMTBFMetrics(machineId);
+                return {
+                        success: true,
+                        data
+                };
+        }
 }

@@ -164,6 +164,58 @@ export class MachineHistoryService {
             }
       }
 
+      /**
+       * Menghitung MTBF (Mean Time Between Failures) untuk 24 jam terakhir
+       * @param machineId Opsional, filter untuk mesin tertentu
+       */
+      async getMTBFMetrics(machineId?: string) {
+            try {
+                  const now = new Date();
+                  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                  const totalPeriodMinutes = 24 * 60; // 1440 menit
+
+                  const query = this.breakdownRepo.createQueryBuilder('event')
+                        .where('event.createdAt >= :startTime', { startTime: twentyFourHoursAgo });
+
+                  if (machineId) {
+                        query.andWhere('event.machineId = :machineId', { machineId });
+                  }
+
+                  const events = await query.getMany();
+
+                  // Filter data duplikat (sama seperti di findAll/getLineSummary)
+                  const uniqueEvents = events.filter((item, index, self) =>
+                        index === self.findIndex((t) => (
+                              new Date(t.createdAt).getTime() === new Date(item.createdAt).getTime() &&
+                              t.machineId === item.machineId
+                        ))
+                  );
+
+                  const totalFailures = uniqueEvents.length;
+                  const totalDowntimeMinutes = uniqueEvents.reduce((acc, curr) => acc + (Number(curr.duration) || 0), 0);
+                  const totalUptimeMinutes = totalPeriodMinutes - totalDowntimeMinutes;
+
+                  // MTBF = Total Uptime / Number of Failures
+                  // Jika tidak ada failure, MTBF dianggap sama dengan total uptime (1440 menit)
+                  const mtbf = totalFailures > 0 
+                        ? Math.round(totalUptimeMinutes / totalFailures) 
+                        : totalUptimeMinutes;
+
+                  return {
+                        machineId: machineId || 'ALL_MACHINES',
+                        mtbfMinutes: mtbf,
+                        totalFailures,
+                        totalDowntimeMinutes,
+                        totalUptimeMinutes,
+                        periodHours: 24,
+                        timestamp: now.toISOString()
+                  };
+            } catch (error) {
+                  this.logger.error(`Gagal menghitung MTBF: ${error.message}`);
+                  throw error;
+            }
+      }
+
       private getShiftStartTime(): Date {
             const now = new Date();
             const shiftStart = new Date(now);
