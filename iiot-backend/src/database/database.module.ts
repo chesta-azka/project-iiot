@@ -20,9 +20,9 @@ import { InfluxService } from './influx/influx.service';
                   useFactory: (configService: ConfigService) => ({
                         type: 'postgres',
                         host: configService.get<string>('DB_HOST', 'localhost'),
-                        port: Number(configService.get<string>('DB_PORT', '5432')),
-                        username: configService.get<string>('DB_USERNAME', 'postgres'),
-                        password: configService.get<string>('DB_PASSWORD', 'postgres'),
+                        port: Number(configService.get<string>('DB_PORT', '5433')),
+                        username: configService.get<string>('DB_USERNAME', 'user_iiot'),
+                        password: configService.get<string>('DB_PASSWORD', 'securepassword'),
                         database: configService.get<string>('DB_NAME', 'iiot_events_db'),
                         entities: [
                               UserEntity,
@@ -30,6 +30,7 @@ import { InfluxService } from './influx/influx.service';
                         ],
                         synchronize: true,
                         dropSchema: false,
+                        logging: false,
                   }),
             }),
 
