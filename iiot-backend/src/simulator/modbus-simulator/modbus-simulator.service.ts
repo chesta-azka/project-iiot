@@ -145,20 +145,12 @@ export class ModbusSimulatorService implements OnModuleInit, OnModuleDestroy {
         fail: 0.0001,
         t: 45,
       },
-      { id: 'AQ-BLW-02', name: 'Blower Beta', speed: 820, fail: 0.0001, t: 46 },
       {
         id: 'AQ-FIL-01',
         name: 'Filler High-Speed',
         speed: 500,
         fail: 0.0002,
         t: 38,
-      },
-      {
-        id: 'AQ-FIL-02',
-        name: 'Filler Medium',
-        speed: 900,
-        fail: 0.0001,
-        t: 35,
       },
       {
         id: 'AQ-CAP-01',
@@ -168,53 +160,11 @@ export class ModbusSimulatorService implements OnModuleInit, OnModuleDestroy {
         t: 40,
       },
       {
-        id: 'AQ-CAP-02',
-        name: 'Capper Linear',
-        speed: 1200,
-        fail: 0.0001,
-        t: 32,
-      },
-      {
         id: 'AQ-LBL-01',
         name: 'Labeler Front',
         speed: 1000,
         fail: 0.0005,
         t: 50,
-      },
-      {
-        id: 'AQ-LBL-02',
-        name: 'Labeler Back',
-        speed: 1000,
-        fail: 0.0005,
-        t: 50,
-      },
-      {
-        id: 'AQ-INK-01',
-        name: 'Inkjet Coder 1',
-        speed: 400,
-        fail: 0.00005,
-        t: 30,
-      },
-      {
-        id: 'AQ-INK-02',
-        name: 'Inkjet Coder 2',
-        speed: 400,
-        fail: 0.00005,
-        t: 30,
-      },
-      {
-        id: 'AQ-PCK-01',
-        name: 'Case Packer A',
-        speed: 3000,
-        fail: 0.001,
-        t: 55,
-      },
-      {
-        id: 'AQ-PCK-02',
-        name: 'Case Packer B',
-        speed: 3200,
-        fail: 0.001,
-        t: 55,
       },
       {
         id: 'AQ-PLT-01',
@@ -224,7 +174,6 @@ export class ModbusSimulatorService implements OnModuleInit, OnModuleDestroy {
         t: 60,
       },
       { id: 'AQ-WRP-01', name: 'Wrapper 1', speed: 10000, fail: 0.0008, t: 42 },
-      { id: 'AQ-WRP-02', name: 'Wrapper 2', speed: 11000, fail: 0.0008, t: 42 },
       {
         id: 'AQ-CON-01',
         name: 'Main Conveyor',
@@ -397,16 +346,16 @@ export class ModbusSimulatorService implements OnModuleInit, OnModuleDestroy {
             `🚨 [FAILURE] ${m.name || 'Unit-' + (index + 1)} Breakdown! Error Code: ${m.alarmCode}`,
           );
 
-          // Jeda perbaikan: 15 detik sampai 1 menit (Lebih variatif)
-          const recoveryDuration = Math.floor(Math.random() * 45000) + 15000;
+          // Jeda perbaikan dipercepat: 5 detik sampai 15 detik
+          const recoveryDuration = Math.floor(Math.random() * 10000) + 5000;
 
           setTimeout(() => {
             m.status = 1; // Kembali RUNNING
             m.alarmCode = 0;
             m.isRecovering = false;
 
-            // Cooldown: 3 - 5 menit agar tidak rewel lagi (Anti mati bareng)
-            const nextCooldown = Math.floor(Math.random() * 120000) + 180000;
+            // Cooldown: 30 detik - 90 detik agar dinamisnya lebih stabil
+            const nextCooldown = Math.floor(Math.random() * 60000) + 30000;
             m.nextAllowedError = Date.now() + nextCooldown;
 
             this.logger.log(

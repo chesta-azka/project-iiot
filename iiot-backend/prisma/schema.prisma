@@ -32,11 +32,12 @@ model Downtime {
   machineId    Int
   machine      Machine   @relation(fields: [machineId], references: [id])
 
-
   startTime    DateTime  @default(now())
   endTime      DateTime?
   duration     Int?      // Duration dalam detik
 
+  // PDT vs UPDT: false = Unplanned (UPDT), true = Planned (PDT)
+  isPlanned    Boolean   @default(false)
 
   // Meta Data
   operatorNote String?
@@ -45,6 +46,7 @@ model Downtime {
 
   createdAt    DateTime  @default(now())
 }
+
 
 // 4. TABLE SETTINGS / ALARM CONFIG (Opsional)
 model AlarmConfig {

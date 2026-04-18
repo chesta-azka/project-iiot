@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MachineTelemetryGateway } from './machine-telemetry/machine-telemetry.gateway';
 import { MachineHistoryController } from './machine-history/machine-history.controller';
 import { MachineAnalyticsController } from './machine-analytics/machine-analytics.controller';
+import { ShiftSummaryController } from './shift-summary/shift-summary.controller';
 import { CoreEngineModule } from 'src/core-engine/core-engine.module';
 import { BreakdownEventEntity } from 'src/database/entities/breakdown-event/breakdown-event.entity';
 import { InfluxAnalyticsService } from 'src/database/influx/influx-analytics.service';
@@ -15,9 +16,12 @@ import { AuthModule } from 'src/auth/auth.module';
     TypeOrmModule.forFeature([BreakdownEventEntity]),
     AuthModule,
     forwardRef(() => CoreEngineModule),
-
   ],
-  controllers: [MachineHistoryController, MachineAnalyticsController],
+  controllers: [
+    MachineHistoryController,
+    MachineAnalyticsController,
+    ShiftSummaryController,
+  ],
   providers: [
     MachineTelemetryGateway,
     MachineHistoryService,
@@ -25,4 +29,5 @@ import { AuthModule } from 'src/auth/auth.module';
   ],
   exports: [MachineTelemetryGateway, MachineHistoryService],
 })
-export class MachineApiModule {}
+export class MachineApiModule { }
+

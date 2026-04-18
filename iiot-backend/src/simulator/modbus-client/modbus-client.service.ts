@@ -26,9 +26,9 @@ export interface MachineData {
 @Injectable()
 export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ModbusClientService.name);
-  private client: Modbus.ModbusTCPClient;
-  private socket: net.Socket;
-  private pollingSubscription: Subscription;
+  private client!: Modbus.ModbusTCPClient;
+  private socket!: net.Socket;
+  private pollingSubscription!: Subscription;
 
   // 1. Subject untuk broadcast data ke service lain secara internal
   private readonly dataSubject = new Subject<MachineData[]>();
@@ -36,7 +36,18 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
 
   // Konfigurasi Mapping
   private readonly REGISTERS_PER_MACHINE = 10;
-  private readonly TOTAL_MACHINES = 16;
+  private readonly TOTAL_MACHINES = 7;
+
+  private readonly machineIDs = [
+    'AQ-BLW-01',
+    'AQ-FIL-01',
+    'AQ-CAP-01',
+    'AQ-LBL-01',
+    'AQ-PLT-01',
+    'AQ-WRP-01',
+    'AQ-CON-01',
+  ];
+
 
   constructor(private configService: ConfigService) { }
 
@@ -122,6 +133,21 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  private generateMachineData() {
+    return this.machineIDs.map(id => {
+      // itung atau random dulu PR-nya di sini
+
+      const performanceRate = Math.floor(Math.random() * (100 - 75 + 1) + 75);
+
+      return {
+        machineId: id,
+        status: Math.random() > 0.2 ? 'RUNNING' : 'STOPPED',
+        pr: performanceRate, // <--- Tambah PR di sini
+        lastUpdate: new Date().toISOString()
+      };
+    });
+  }
+
   /**
    * READ DATA MASSAL (Holding Registers)
    */
@@ -136,31 +162,13 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
       const results: MachineData[] = [];
 
       // Daftar ID yang harus sinkron dengan Database & Simulator
-      const machineIDs = [
-        'AQ-BLW-01',
-        'AQ-BLW-02',
-        'AQ-FIL-01',
-        'AQ-FIL-02',
-        'AQ-CAP-01',
-        'AQ-CAP-02',
-        'AQ-LBL-01',
-        'AQ-LBL-02',
-        'AQ-INK-01',
-        'AQ-INK-02',
-        'AQ-PCK-01',
-        'AQ-PCK-02',
-        'AQ-PLT-01',
-        'AQ-WRP-01',
-        'AQ-WRP-02',
-        'AQ-CON-01',
-      ];
-
+  
       // Gunakan offset 50 register (sesuai jatah 100 byte per mesin di Simulator)
       const OFFSET = 50;
 
       for (let i = 0; i < this.TOTAL_MACHINES; i++) {
         const startAddress = i * OFFSET;
-        const mId = machineIDs[i];
+        const mId = this.machineIDs[i];
 
         try {
           // 2. Tarik 10 register (cukup untuk menampung status sampai load)

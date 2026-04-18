@@ -20,21 +20,12 @@ export class PollingSchedulerService implements OnModuleInit, OnModuleDestroy {
   // Daftar mesin yang akan diproses oleh Engine
   private readonly machines = [
     { id: 'AQ-BLW-01', name: 'Mesin Blower 01', index: 0 },
-    { id: 'AQ-BLW-02', name: 'Mesin Blower 02', index: 1 },
-    { id: 'AQ-FIL-01', name: 'Mesin Filler 01', index: 2 },
-    { id: 'AQ-FIL-02', name: 'Mesin Filler 02', index: 3 },
-    { id: 'AQ-CAP-01', name: 'Mesin Capping 01', index: 4 },
-    { id: 'AQ-CAP-02', name: 'Mesin Capping 02', index: 5 },
-    { id: 'AQ-LBL-01', name: 'Mesin Labeller 01', index: 6 },
-    { id: 'AQ-LBL-02', name: 'Mesin Labeller 02', index: 7 },
-    { id: 'AQ-INK-01', name: 'Mesin Inkjet Coder 01', index: 8 },
-    { id: 'AQ-INK-02', name: 'Mesin Inkjet Coder 02', index: 9 },
-    { id: 'AQ-PCK-01', name: 'Mesin Case Packer 01', index: 10 },
-    { id: 'AQ-PCK-02', name: 'Mesin Case Packer 02', index: 11 },
-    { id: 'AQ-PLT-01', name: 'Mesin Palletizer 01', index: 12 },
-    { id: 'AQ-WRP-01', name: 'Mesin Stretch Wrapper 01', index: 13 },
-    { id: 'AQ-WRP-02', name: 'Mesin Stretch Wrapper 02', index: 14 },
-    { id: 'AQ-CON-01', name: 'Mesin Conveyor System', index: 15 },
+    { id: 'AQ-FIL-01', name: 'Mesin Filler 01', index: 1 },
+    { id: 'AQ-CAP-01', name: 'Mesin Capping 01', index: 2 },
+    { id: 'AQ-LBL-01', name: 'Mesin Labeller 01', index: 3 },
+    { id: 'AQ-PLT-01', name: 'Mesin Palletizer 01', index: 4 },
+    { id: 'AQ-WRP-01', name: 'Mesin Stretch Wrapper 01', index: 5 },
+    { id: 'AQ-CON-01', name: 'Mesin Conveyor System', index: 6 },
   ];
 
   constructor(

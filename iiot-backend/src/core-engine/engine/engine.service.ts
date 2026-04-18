@@ -10,6 +10,8 @@ import { MachineTelemetryGateway } from 'src/machine-api/machine-telemetry/machi
 import { MachineRegisters } from 'src/simulator/modbus-simulator/modbus-simulator.service';
 import { ShiftService } from '../shift/shift.service';
 import { PrismaService } from '../../../prisma/prisma.service';
+// IMPORT SERVICE MODBUS (Sesuaikan path jika beda folder)
+import { ModbusClientService, MachineData } from '../../simulator/modbus-client/modbus-client.service';
 
 interface MachineStateTracker {
   isRunning: boolean;
@@ -22,6 +24,7 @@ interface MachineStateTracker {
   machineName: string;
   isSaving?: boolean;
   currentOperator?: string;
+  pr?: number; // Tambahkan field pr di tracker
 }
 
 @Injectable()
@@ -29,6 +32,7 @@ export class RealTimeEngineService implements OnModuleInit {
   private readonly logger = new Logger(RealTimeEngineService.name);
   private lastProcessTimestamp = new Map<string, number>();
   private machinesTracker = new Map<string, MachineStateTracker>();
+  private machines: any[] = []; // Menampung hasil subscribe terbaru
 
   constructor(
     private readonly influxService: InfluxService,
@@ -36,10 +40,26 @@ export class RealTimeEngineService implements OnModuleInit {
     private readonly telemetryGateway: MachineTelemetryGateway,
     private readonly shiftService: ShiftService,
     private readonly prisma: PrismaService,
+    // Dependency Injection Modbus Service
+    private readonly modbusService: ModbusClientService,
   ) { }
 
   onModuleInit() {
     this.logger.log(`[Engine] Multi-Machine RealTime Engine Initialized.`);
+
+    // LOGIC DARI LU: Subscribe data Modbus
+    this.modbusService.machineData$.subscribe((data: any[]) => {
+      this.machines = data.map(m => ({
+        ...m,
+        pr: m.pr, // <--- Baris keramat biar PR-nya gak ilang
+      }));
+
+      // Automatis update tracker setiap ada data baru masuk dari modbus
+      data.forEach(m => {
+        const tracker = this.getOrCreateTracker(m.id, m.name);
+        tracker.pr = m.pr; // Simpan PR ke tracker
+      });
+    });
   }
 
   private getOrCreateTracker(
@@ -57,6 +77,7 @@ export class RealTimeEngineService implements OnModuleInit {
         lastBottleCount: 0,
         isSaving: false,
         machineName: machineName || `Machine ${machineId}`,
+        pr: 0,
       });
       this.lastProcessTimestamp.set(machineId, Date.now());
     }
@@ -75,7 +96,7 @@ export class RealTimeEngineService implements OnModuleInit {
 
       const isCurrentlyRunning = rawData.RUN_STOP_BIT === 1;
       const previousState = tracker.isRunning;
-      const currentShift = this.shiftService.getCurrentShift();
+      const currentShift = this.shiftService.getCurrentShift(); // returns ShiftDefinition
 
       const now = Date.now();
       const lastTs = this.lastProcessTimestamp.get(machineId) || now;
@@ -187,16 +208,9 @@ export class RealTimeEngineService implements OnModuleInit {
     rawData: MachineRegisters,
     shiftName: string,
   ): void {
-    const uptimeMinutes = tracker.totalUptimeMs / 60000;
-    const standardSpeed = 100;
-    const idealOutput = standardSpeed * uptimeMinutes;
-
-    let prValue = 0;
-    if (idealOutput > 0) {
-      prValue = Math.round((rawData.BOTTLE_COUNTER / idealOutput) * 100);
-    }
-
-    const finalPR = Math.min(prValue, 100);
+    // Gunakan PR dari tracker (hasil modbus subscribe) jika tersedia, 
+    // jika tidak baru hitung manual.
+    const finalPR = tracker.pr || 0;
 
     this.telemetryGateway.sendToFrontend({
       machineId: machineId,
@@ -228,22 +242,11 @@ export class RealTimeEngineService implements OnModuleInit {
 
   getAllTrackersWithId() {
     return Array.from(this.machinesTracker.entries()).map(([id, tracker]) => {
-      const uptimeMinutes = tracker.totalUptimeMs / 60000;
-      const standardSpeed = 100;
-      const idealOutput = standardSpeed * uptimeMinutes;
-
-      let prValue = 0;
-      if (idealOutput > 0) {
-        prValue = Math.round((tracker.lastBottleCount / idealOutput) * 100);
-      }
-
-      const finalPR = Math.min(prValue, 100);
-
       return {
         machineId: id,
         ...tracker,
         status: tracker.isRunning ? 'RUNNING' : 'STOPPED',
-        performanceRate: finalPR,
+        performanceRate: tracker.pr || 0,
         updtSeconds: (tracker.currentUpdtDurationMs / 1000).toFixed(1),
       };
     });

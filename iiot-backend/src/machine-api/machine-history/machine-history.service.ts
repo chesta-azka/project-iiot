@@ -1,6 +1,6 @@
 import { ShiftService } from './../../core-engine/shift/shift.service';
 import { RealTimeEngineService } from './../../core-engine/engine/engine.service';
-import { Injectable, Logger, Query } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThanOrEqual, Repository } from 'typeorm';
 import { BreakdownEventEntity } from 'src/database/entities/breakdown-event/breakdown-event.entity';
@@ -13,6 +13,7 @@ export class MachineHistoryService {
     @InjectRepository(BreakdownEventEntity)
     private readonly breakdownRepo: Repository<BreakdownEventEntity>,
     private readonly engineService: RealTimeEngineService,
+    private readonly shiftService: ShiftService,
   ) {}
 
   /**
@@ -35,7 +36,7 @@ export class MachineHistoryService {
 
       const [rawEvents, total] = await query.getManyAndCount();
 
-      // Tambahkan filter ini agar data dengan startTime yang sama tidak double
+      // Filter agar data dengan startTime yang sama tidak double
       const items = rawEvents.filter(
         (item, index, self) =>
           index ===
@@ -64,8 +65,6 @@ export class MachineHistoryService {
   }
 
   async getTopBreakdownReasons() {
-    // Query ke Postgres untuk mencari alasan stop yang paling sering muncul
-    // Kita ambil 5 besar (Top 5)
     try {
       const result = await this.breakdownRepo
         .createQueryBuilder('breakdown')
@@ -85,23 +84,24 @@ export class MachineHistoryService {
 
   /**
    * Menghitung ringkasan performa mesin untuk dashboard
+   * Menggunakan ShiftService untuk jadwal shift yang konsisten (06/14/22)
    */
   async getLineSummary() {
     const startTime = Date.now();
     try {
-      // Dapatkan waktu awal shift (gunakan function helper yg tadi)
-      const shiftStart = this.getShiftStartTime();
+      // Gunakan ShiftService — jadwal 06/14/22 sesuai PPT
+      const shiftStart = this.shiftService.getShiftStartTime();
+      const currentShift = this.shiftService.getCurrentShift();
       const realTimeMachines = this.engineService.getAllTrackersWithId();
 
-      // OPTIMASI: Hanya ambil data yang terjadi SEJAK awal shift
-      // Database jauh lebih ringan kerjanya!
+      // Ambil data sejak awal shift aktif
       const rawEvents = await this.breakdownRepo.find({
         where: {
           createdAt: MoreThanOrEqual(shiftStart),
         },
       });
 
-      // Function untuk pengelompokan data
+      // De-duplicate events per mesin + timestamp
       const events = rawEvents.filter(
         (item, index, self) =>
           index ===
@@ -113,19 +113,14 @@ export class MachineHistoryService {
           ),
       );
 
-      // Kelompokan data per mesin untuk kebutuhan dashboard Line
+      // Kelompokan per mesin
       const historyMap = events.reduce((acc: any, curr) => {
         const id = curr.machineId;
-
         if (!acc[id]) {
-          acc[id] = {
-            totalEvents: 0,
-            totalDowntime: 0,
-          };
+          acc[id] = { totalEvents: 0, totalDowntime: 0 };
         }
         acc[id].totalEvents += 1;
         acc[id].totalDowntime += Number(curr.duration || 0);
-
         return acc;
       }, {});
 
@@ -134,15 +129,12 @@ export class MachineHistoryService {
           totalEvents: 0,
           totalDowntime: 0,
         };
-
         return {
           machineId: m.machineId,
           machineName: m.machineName,
-          // Data dari ENGINE (Real-time)
           status: m.status,
           currentCounter: m.lastBottleCount,
           currentDownTime: m.updtSeconds,
-          // Data dari DATABASE (History hari ini/all time)
           totalBreakdownEvents: history.totalEvents,
           totalDowntimeMinutes: Math.round(history.totalDowntime / 60),
           healthStatus:
@@ -162,42 +154,22 @@ export class MachineHistoryService {
       return {
         status: 'Success',
         line_id: 'LINE_2',
-        totalDowntimeGlobal: totalDowntimeGlobal,
+        totalDowntimeGlobal,
         shift_info: {
+          name: currentShift.name,
+          number: currentShift.number,
           start_from: shiftStart.toISOString(),
           is_live: true,
         },
         data: combinedData,
         metadata: {
-          execution_time_ms: Date.now() - startTime, // Informasi kecepatan si server
-          record_count: rawEvents.length, // Angka ini menunjukan jumlah breakdowndi shift ini
+          execution_time_ms: Date.now() - startTime,
+          record_count: rawEvents.length,
         },
       };
     } catch (error) {
       this.logger.error(`Failed to calculate line summary: ${error.message}`);
-      return { data: [] }; // Return minimal object agar controller tidak crash
+      return { data: [] };
     }
-  }
-
-  private getShiftStartTime(): Date {
-    const now = new Date();
-    const shiftStart = new Date(now);
-    const hour = now.getHours();
-
-    if (hour >= 7 && hour < 15) {
-      // Shift 1: Mulai jam 07.00 pagi hari ini
-      shiftStart.setHours(7, 0, 0, 0);
-    } else if (hour >= 15 && hour < 23) {
-      // Shift 2: Mulai jam 15.00 sore hari ini
-      shiftStart.setHours(15, 0, 0, 0);
-    } else {
-      // Shift 3: Mulai jam 23.00 malam
-      if (hour < 7) {
-        // Jika jam 01.00 pagi, berarti shift mulai jam 23.00 malam KEMARIN
-        shiftStart.setDate(shiftStart.getDate() - 1);
-      }
-      shiftStart.setHours(23, 0, 0, 0);
-    }
-    return shiftStart;
   }
 }
