@@ -12,11 +12,13 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // Function ini si agar DTO bekerja otomatis
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,  // Ini yang bikin @Type(() => Number) jalan
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true, // Ini yang bikin @Type(() => Number) jalan
+    }),
+  );
 
   // --- TAMBAHKAN BARIS INI ---
   app.enableCors({
@@ -31,21 +33,24 @@ async function bootstrap() {
   // ---- KONFIGURASI SWAGGER ----
   const config = new DocumentBuilder()
     .setTitle('Chesta IIOT Backend API Cuyy..')
-    .setDescription('Dokumentasi API untuk sistem pemantauan mesin secara real-time')
+    .setDescription(
+      'Dokumentasi API untuk sistem pemantauan mesin secara real-time',
+    )
     .setVersion('1.0')
     .addBearerAuth() // Agar kita bisa input token JWT di swagger
-    .build()
-  
+    .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document); // Akses di https://localhost:3006/docs
   // ------------------------------
-
 
   // Start Application
   const port = Number(configService.get<string>('PORT', '3006'));
   await app.listen(port);
 
-  console.log(`🚀 Backend IIOT AQUA is running on: http://localhost:${port}/api`);
+  console.log(
+    `🚀 Backend IIOT AQUA is running on: http://localhost:${port}/api`,
+  );
   console.log(`📑 Documentation available at: http://localhost:${port}/docs`);
 }
 bootstrap();

@@ -23,7 +23,8 @@ model Machine {
   updatedAt    DateTime   @updatedAt
 }
 
-// 3. TABLE LOG DOWNTIME (Buat Operator & Supervisor)
+
+// 4. TABLE LOG DOWNTIME (Buat Operator & Supervisor)
 model Downtime {
   id           Int       @id @default(autoincrement())
   
@@ -31,15 +32,14 @@ model Downtime {
   machineId    Int
   machine      Machine   @relation(fields: [machineId], references: [id])
 
+
   startTime    DateTime  @default(now())
   endTime      DateTime?
   duration     Int?      // Duration dalam detik
 
-  // Input Operator
-  reason       String?   // Contoh: "Reject", "Material Habis", "Maintenance"
-  operatorNote String?
 
-  // Validasi Supervisor
+  // Meta Data
+  operatorNote String?
   isApproved   Boolean   @default(false)
   approvedBy   String?
 

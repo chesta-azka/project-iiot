@@ -6,15 +6,14 @@ import { LoginDto } from './dto/login.dto';
 @ApiTags('Authentication') // Mengelompokkan di Swagger
 @Controller('auth')
 export class AuthController {
-      constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
-      @Post('login')
-      @HttpCode(HttpStatus.OK) // Expert: Menggunakan Enum daripada angka manual 200
-      @ApiOperation({ summary: 'Masuk ke sistem dan dapatkan Token JWT' })
-      @ApiResponse({ status: 200, description: 'Login Berhasil' })
-      @ApiResponse({ status: 401, description: 'Unauthorized' })
-      async login(@Body() loginDto: LoginDto) {
-            return this.authService.login(loginDto.username, loginDto.password);
-      }
-
+  @Post('login')
+  @HttpCode(HttpStatus.OK) // Expert: Menggunakan Enum daripada angka manual 200
+  @ApiOperation({ summary: 'Masuk ke sistem dan dapatkan Token JWT' })
+  @ApiResponse({ status: 200, description: 'Login Berhasil' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto.username, loginDto.password);
+  }
 }

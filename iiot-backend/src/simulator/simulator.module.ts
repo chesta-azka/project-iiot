@@ -9,16 +9,13 @@ import { MachineApiModule } from 'src/machine-api/machine-api.module';
   imports: [
     forwardRef(() => CoreEngineModule), // Agar bisa melakukan RealTimeEngineService
     MachineApiModule, // Agar bisa akses MachineTelemetryGateway
-  ], 
+  ],
   providers: [
     ModbusSimulatorService,
     ModbusClientService,
     PollingSchedulerService,
   ],
   // Export ModbusSimulatorService jika modul lain perlu mengaksesnya
-  exports: [
-    ModbusSimulatorService,
-    ModbusClientService,
-  ],
+  exports: [ModbusSimulatorService, ModbusClientService],
 })
 export class SimulatorModule {}

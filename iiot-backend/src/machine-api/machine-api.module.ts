@@ -10,21 +10,18 @@ import { MachineHistoryService } from './machine-history/machine-history.service
 import { AuthModule } from 'src/auth/auth.module';
 
 @Global()
-  @Module({
-    imports: [
-      TypeOrmModule.forFeature([BreakdownEventEntity]),
-      AuthModule,
-      forwardRef(() => CoreEngineModule),
-      CoreEngineModule,
-    ],
-    controllers: [
-      MachineHistoryController,
-      MachineAnalyticsController,
-    ],
-    providers: [
-      MachineTelemetryGateway,
-      MachineHistoryService,
-      InfluxAnalyticsService
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([BreakdownEventEntity]),
+    AuthModule,
+    forwardRef(() => CoreEngineModule),
+
+  ],
+  controllers: [MachineHistoryController, MachineAnalyticsController],
+  providers: [
+    MachineTelemetryGateway,
+    MachineHistoryService,
+    InfluxAnalyticsService,
   ],
   exports: [MachineTelemetryGateway, MachineHistoryService],
 })

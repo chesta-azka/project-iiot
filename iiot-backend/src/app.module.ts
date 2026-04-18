@@ -6,12 +6,17 @@ import { CoreEngineModule } from './core-engine/core-engine.module';
 import { MachineApiModule } from './machine-api/machine-api.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { Module, NestModule, MiddlewareConsumer, Logger, RequestMethod } from '@nestjs/common';
-import { LoggerMiddleware } from './common/middleware/logger.middleware'
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  Logger,
+  RequestMethod,
+} from '@nestjs/common';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
-
     // Ini di tambahkan agar si variable .env tersedia secara global
     ConfigModule.forRoot({
       isGlobal: true,

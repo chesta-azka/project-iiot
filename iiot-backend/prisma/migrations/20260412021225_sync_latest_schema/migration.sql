@@ -20,7 +20,6 @@ CREATE TABLE "Downtime" (
     "startTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endTime" TIMESTAMP(3),
     "duration" INTEGER,
-    "reason" TEXT,
     "operatorNote" TEXT,
     "isApproved" BOOLEAN NOT NULL DEFAULT false,
     "approvedBy" TEXT,
