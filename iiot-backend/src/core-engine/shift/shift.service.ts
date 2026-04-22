@@ -4,7 +4,7 @@ export interface ShiftDefinition {
   number: number;
   name: string;
   startHour: number; // jam mulai (format 24h)
-  endHour: number;   // jam selesai (format 24h)
+  endHour: number; // jam selesai (format 24h)
   hours: HourWindow[];
 }
 
@@ -83,7 +83,10 @@ export class ShiftService {
   }
 
   /** Kembalikan Date awal shift sesuai nomor shift (untuk query history) */
-  getShiftStartTimeByNumber(shiftNumber: number, refDate: Date = new Date()): Date {
+  getShiftStartTimeByNumber(
+    shiftNumber: number,
+    refDate: Date = new Date(),
+  ): Date {
     const shift = this.getShiftByNumber(shiftNumber);
     if (!shift) throw new Error(`Shift ${shiftNumber} tidak ditemukan`);
 
@@ -98,11 +101,13 @@ export class ShiftService {
   }
 
   /** Kembalikan Date akhir shift */
-  getShiftEndTimeByNumber(shiftNumber: number, refDate: Date = new Date()): Date {
+  getShiftEndTimeByNumber(
+    shiftNumber: number,
+    refDate: Date = new Date(),
+  ): Date {
     const start = this.getShiftStartTimeByNumber(shiftNumber, refDate);
     const end = new Date(start);
     end.setHours(end.getHours() + 8);
     return end;
   }
 }
-

@@ -10,6 +10,12 @@ import { InfluxAnalyticsService } from 'src/database/influx/influx-analytics.ser
 import { MachineHistoryService } from './machine-history/machine-history.service';
 import { AuthModule } from 'src/auth/auth.module';
 
+import { PageDashboardController } from './page-dashboard.controller';
+import { PageLineController } from './page-line.controller';
+import { PageMachineStatusController } from './page-machine-status.controller';
+import { PageScreenDeliveryController } from './page-screen-delivery.controller';
+import { FrontendBroadcastService } from './frontend-broadcast.service';
+
 @Global()
 @Module({
   imports: [
@@ -21,13 +27,17 @@ import { AuthModule } from 'src/auth/auth.module';
     MachineHistoryController,
     MachineAnalyticsController,
     ShiftSummaryController,
+    PageDashboardController,
+    PageLineController,
+    PageMachineStatusController,
+    PageScreenDeliveryController,
   ],
   providers: [
     MachineTelemetryGateway,
     MachineHistoryService,
     InfluxAnalyticsService,
+    FrontendBroadcastService,
   ],
   exports: [MachineTelemetryGateway, MachineHistoryService],
 })
-export class MachineApiModule { }
-
+export class MachineApiModule {}

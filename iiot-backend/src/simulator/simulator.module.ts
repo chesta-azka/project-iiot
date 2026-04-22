@@ -16,9 +16,8 @@ import { MachineApiModule } from 'src/machine-api/machine-api.module';
     ModbusClientService,
     MachineGateway,
     PollingSchedulerService,
-
   ],
   // Export ModbusSimulatorService jika modul lain perlu mengaksesnya
   exports: [ModbusSimulatorService, ModbusClientService],
 })
-export class SimulatorModule { }
+export class SimulatorModule {}

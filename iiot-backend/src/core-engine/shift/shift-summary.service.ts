@@ -8,10 +8,10 @@ import { RealTimeEngineService } from '../engine/engine.service';
 export interface HourMetrics {
   jamKe: number;
   timeRange: string;
-  updtMin: number;   // Unplanned Downtime menit
-  upstFreq: number;  // Frekuensi stop tak terencana
-  pdtMin: number;    // Planned Downtime menit
-  pr: number;        // Performance Rate (%)
+  updtMin: number; // Unplanned Downtime menit
+  upstFreq: number; // Frekuensi stop tak terencana
+  pdtMin: number; // Planned Downtime menit
+  pr: number; // Performance Rate (%)
 }
 
 export interface ShiftSummaryResult {
@@ -73,14 +73,19 @@ export class ShiftSummaryService {
   // ─── PUBLIC API ────────────────────────────────────────────────────────────
 
   /** Shift yang sedang aktif (real-time) */
-  async getCurrentShiftSummary(machineId?: string): Promise<ShiftSummaryResult> {
+  async getCurrentShiftSummary(
+    machineId?: string,
+  ): Promise<ShiftSummaryResult> {
     await this.checkAndAutoSeedToday();
     const currentShift = this.shiftService.getCurrentShift();
     return this.buildShiftSummary(currentShift, machineId);
   }
 
   /** Shift tertentu berdasarkan nomor (1/2/3) */
-  async getShiftSummaryByNumber(shiftNumber: number, machineId?: string): Promise<ShiftSummaryResult> {
+  async getShiftSummaryByNumber(
+    shiftNumber: number,
+    machineId?: string,
+  ): Promise<ShiftSummaryResult> {
     await this.checkAndAutoSeedToday();
     const shift = this.shiftService.getShiftByNumber(shiftNumber);
     if (!shift) throw new Error(`Shift ${shiftNumber} tidak ditemukan`);
@@ -135,13 +140,26 @@ export class ShiftSummaryService {
 
   // ─── CORE BUILDER ─────────────────────────────────────────────────────────
 
-  private async buildShiftSummary(shift: ShiftDefinition, machineId?: string): Promise<ShiftSummaryResult> {
+  private async buildShiftSummary(
+    shift: ShiftDefinition,
+    machineId?: string,
+  ): Promise<ShiftSummaryResult> {
     const now = new Date();
-    const shiftStart = this.shiftService.getShiftStartTimeByNumber(shift.number, now);
-    const shiftEnd = this.shiftService.getShiftEndTimeByNumber(shift.number, now);
+    const shiftStart = this.shiftService.getShiftStartTimeByNumber(
+      shift.number,
+      now,
+    );
+    const shiftEnd = this.shiftService.getShiftEndTimeByNumber(
+      shift.number,
+      now,
+    );
 
     // Ambil semua downtime record dalam rentang shift ini dari Prisma
-    const downtimeRecords = await this.getDowntimeInRange(shiftStart, shiftEnd, machineId);
+    const downtimeRecords = await this.getDowntimeInRange(
+      shiftStart,
+      shiftEnd,
+      machineId,
+    );
 
     // Hitung metrik per jam
     const hours: HourMetrics[] = shift.hours.map((win) => {
@@ -219,12 +237,15 @@ export class ShiftSummaryService {
     if (inWindow.length === 0 && winStart.getTime() < Date.now()) {
       const seedName = `${winStart.toISOString()}-${winEnd.toISOString()}`;
       const rand1 = this.getSeededRandom(seedName + 'A');
-      
+
       // 70% peluang ada downtime dummy biar datanya dinamis
       if (rand1 > 0.3) {
         updtMin = Math.floor(this.getSeededRandom(seedName + 'B') * 12); // max 12 menit
-        pdtMin = Math.floor(this.getSeededRandom(seedName + 'C') * 5);   // max 5 menit
-        upstFreq = updtMin > 0 ? Math.floor(this.getSeededRandom(seedName + 'D') * 3) + 1 : 0;
+        pdtMin = Math.floor(this.getSeededRandom(seedName + 'C') * 5); // max 5 menit
+        upstFreq =
+          updtMin > 0
+            ? Math.floor(this.getSeededRandom(seedName + 'D') * 3) + 1
+            : 0;
       }
     }
 
@@ -233,15 +254,29 @@ export class ShiftSummaryService {
 
     const usedMinutes = updtMin + pdtMin;
     const pr = this.round(
-      Math.max(0, ((this.HOUR_MINUTES - usedMinutes) / this.HOUR_MINUTES) * 100),
+      Math.max(
+        0,
+        ((this.HOUR_MINUTES - usedMinutes) / this.HOUR_MINUTES) * 100,
+      ),
     );
 
-    return { jamKe: win.jamKe, timeRange: win.timeRange, updtMin, upstFreq, pdtMin, pr };
+    return {
+      jamKe: win.jamKe,
+      timeRange: win.timeRange,
+      updtMin,
+      upstFreq,
+      pdtMin,
+      pr,
+    };
   }
 
   // ─── DATA ACCESS ──────────────────────────────────────────────────────────
 
-  private async getDowntimeInRange(start: Date, end: Date, machineId?: string): Promise<DowntimeRecord[]> {
+  private async getDowntimeInRange(
+    start: Date,
+    end: Date,
+    machineId?: string,
+  ): Promise<DowntimeRecord[]> {
     try {
       const whereClause: any = {
         startTime: { gte: start },
@@ -281,12 +316,14 @@ export class ShiftSummaryService {
 
     // Cek apakah ada record Downtime hari ini untuk mesin mana pun
     const existing = await this.prisma.downtime.findFirst({
-        where: { startTime: { gte: today } }
+      where: { startTime: { gte: today } },
     });
 
     if (!existing) {
-        this.logger.warn('[AutoSeed] Data downtime hari ini kosong. Menginjeksi data dummy secara otomatis...');
-        await this.generateDynamicDowntimes(today);
+      this.logger.warn(
+        '[AutoSeed] Data downtime hari ini kosong. Menginjeksi data dummy secara otomatis...',
+      );
+      await this.generateDynamicDowntimes(today);
     }
     this.hasAutoSeededToday = true;
   }
@@ -330,7 +367,9 @@ export class ShiftSummaryService {
 
     if (newDowntimes.length > 0) {
       await this.prisma.downtime.createMany({ data: newDowntimes });
-      this.logger.log(`[AutoSeed] Berhasil injeksi otomatis ${newDowntimes.length} downtime ke database!`);
+      this.logger.log(
+        `[AutoSeed] Berhasil injeksi otomatis ${newDowntimes.length} downtime ke database!`,
+      );
     }
   }
 

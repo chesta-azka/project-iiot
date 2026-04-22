@@ -16,8 +16,12 @@ import { MachineApiModule } from 'src/machine-api/machine-api.module';
     forwardRef(() => SimulatorModule),
     forwardRef(() => MachineApiModule),
   ],
-  providers: [RealTimeEngineService, ShiftService, ShiftSummaryService, PollingSchedulerService],
+  providers: [
+    RealTimeEngineService,
+    ShiftService,
+    ShiftSummaryService,
+    PollingSchedulerService,
+  ],
   exports: [RealTimeEngineService, ShiftService, ShiftSummaryService],
 })
 export class CoreEngineModule {}
-

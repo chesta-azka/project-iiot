@@ -49,9 +49,9 @@ Fields:
 - `updated_at` timestamptz
 
 Contoh:
-- `LINE-1`
-- `LINE-2`
-- `LINE-3`
+- `1`
+- `2`
+- `3`
 
 ### 3. machines
 Master mesin per line.

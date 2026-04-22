@@ -11,7 +11,10 @@ import { MachineRegisters } from 'src/simulator/modbus-simulator/modbus-simulato
 import { ShiftService } from '../shift/shift.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 // IMPORT SERVICE MODBUS (Sesuaikan path jika beda folder)
-import { ModbusClientService, MachineData } from '../../simulator/modbus-client/modbus-client.service';
+import {
+  ModbusClientService,
+  MachineData,
+} from '../../simulator/modbus-client/modbus-client.service';
 
 interface MachineStateTracker {
   isRunning: boolean;
@@ -42,20 +45,20 @@ export class RealTimeEngineService implements OnModuleInit {
     private readonly prisma: PrismaService,
     // Dependency Injection Modbus Service
     private readonly modbusService: ModbusClientService,
-  ) { }
+  ) {}
 
   onModuleInit() {
     this.logger.log(`[Engine] Multi-Machine RealTime Engine Initialized.`);
 
     // LOGIC DARI LU: Subscribe data Modbus
     this.modbusService.machineData$.subscribe((data: any[]) => {
-      this.machines = data.map(m => ({
+      this.machines = data.map((m) => ({
         ...m,
         pr: m.pr, // <--- Baris keramat biar PR-nya gak ilang
       }));
 
       // Automatis update tracker setiap ada data baru masuk dari modbus
-      data.forEach(m => {
+      data.forEach((m) => {
         const tracker = this.getOrCreateTracker(m.id, m.name);
         tracker.pr = m.pr; // Simpan PR ke tracker
       });
@@ -208,7 +211,7 @@ export class RealTimeEngineService implements OnModuleInit {
     rawData: MachineRegisters,
     shiftName: string,
   ): void {
-    // Gunakan PR dari tracker (hasil modbus subscribe) jika tersedia, 
+    // Gunakan PR dari tracker (hasil modbus subscribe) jika tersedia,
     // jika tidak baru hitung manual.
     const finalPR = tracker.pr || 0;
 

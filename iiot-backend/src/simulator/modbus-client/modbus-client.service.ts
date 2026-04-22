@@ -48,8 +48,7 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
     'AQ-CON-01',
   ];
 
-
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
   onModuleInit() {
     this.setupClient();
@@ -134,7 +133,7 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
   }
 
   private generateMachineData() {
-    return this.machineIDs.map(id => {
+    return this.machineIDs.map((id) => {
       // itung atau random dulu PR-nya di sini
 
       const performanceRate = Math.floor(Math.random() * (100 - 75 + 1) + 75);
@@ -143,7 +142,7 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
         machineId: id,
         status: Math.random() > 0.2 ? 'RUNNING' : 'STOPPED',
         pr: performanceRate, // <--- Tambah PR di sini
-        lastUpdate: new Date().toISOString()
+        lastUpdate: new Date().toISOString(),
       };
     });
   }
@@ -162,7 +161,7 @@ export class ModbusClientService implements OnModuleInit, OnModuleDestroy {
       const results: MachineData[] = [];
 
       // Daftar ID yang harus sinkron dengan Database & Simulator
-  
+
       // Gunakan offset 50 register (sesuai jatah 100 byte per mesin di Simulator)
       const OFFSET = 50;
 
