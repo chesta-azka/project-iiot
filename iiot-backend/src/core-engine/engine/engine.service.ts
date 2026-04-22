@@ -8,6 +8,8 @@ import { MachineRegisters } from 'src/simulator/modbus-simulator/modbus-simulato
 import { MachineData } from '../../simulator/modbus-client/modbus-client.service';
 import { ShiftService } from '../shift/shift.service';
 import { machine } from 'os';
+import { EmailService } from 'src/notification/email.service';
+import { ConfigService } from '@nestjs/config';
 
 interface MachineStateTracker {
       isRunning: boolean;
@@ -34,6 +36,8 @@ export class RealTimeEngineService implements OnModuleInit {
             private readonly influxService: InfluxService,
             private readonly telemetryGateway: MachineTelemetryGateway,
             private readonly shiftService: ShiftService,
+            private readonly emailService: EmailService,
+            private readonly configService: ConfigService
       ) { }
 
       onModuleInit() {
@@ -105,6 +109,18 @@ export class RealTimeEngineService implements OnModuleInit {
             tracker.upstCount += 1;
             tracker.updtStartTime = new Date();
             this.logger.warn(`[DOWN] ${machineId} - Alarm: ${tracker.latestAlarmCode}`);
+
+            // Kirim notifikasi via Email jika mesin mati karena Alarm (Kode Alarm bukan 0)
+            if (tracker.latestAlarmCode !== 0) {
+                  const targetEmail = this.configService.get<string>('ALERT_TARGET_EMAIL', 'spv.produksi@aqua.com');
+                  this.emailService.sendAlertEmail(
+                        targetEmail,
+                        machineId,
+                        tracker.machineName,
+                        `Mesin terdeteksi STOP karena terjadi suatu error. Kode Alarm yang tertangkap adalah: ${tracker.latestAlarmCode}. Mohon segera periksa ke lokasi (Line).`,
+                        tracker.latestAlarmCode
+                  );
+            }
       }
 
       private async handleRestartEvent(machineId: string, tracker: MachineStateTracker, shiftName: string): Promise<void> {

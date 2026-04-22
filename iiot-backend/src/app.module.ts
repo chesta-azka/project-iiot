@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { Module, NestModule, MiddlewareConsumer, Logger, RequestMethod } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware'
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware'
     MachineApiModule,
     CoreEngineModule,
     SimulatorModule,
-    AuthModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
