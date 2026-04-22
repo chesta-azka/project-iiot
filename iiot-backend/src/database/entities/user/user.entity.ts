@@ -4,7 +4,8 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 export enum UserRole {
       OPERATOR = 'OPERATOR',
       SUPERVISOR = 'SUPERVISOR',
-      MANAGER = 'MANAGER'
+      MANAGER = 'MANAGER',
+      PPIC = 'PPIC'
 }
 
 @Entity('USERS')

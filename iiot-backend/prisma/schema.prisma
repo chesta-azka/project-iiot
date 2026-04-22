@@ -18,9 +18,10 @@ model Machine {
   lastTemp     Float      @default(0.0)
 
   // Relasi ke Downtime
-  downtimes    Downtime[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  downtimes     Downtime[]
+  plannedDts    PlannedDowntime[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 // 3. TABLE LOG DOWNTIME (Buat Operator & Supervisor)
@@ -52,4 +53,23 @@ model AlarmConfig {
   alarmCode    Int      @unique
   description  String
   severity     String   @default("CRITICAL") // CRITICAL, WARNING, INFO
+}
+
+// 5. TABLE PLANNED DOWNTIME (Untuk PPIC)
+model PlannedDowntime {
+  id           Int       @id @default(autoincrement())
+  
+  machineId    Int
+  machine      Machine   @relation(fields: [machineId], references: [id])
+
+  planDate     DateTime
+  duration     Int       // Durasi rencana dalam menit/detik
+  reason       String    // Misal: "Preventive Maintenance", "Cleaning"
+  
+  // Mekanisme Lock-on-Submit
+  isLocked     Boolean   @default(true)
+  submittedBy  String?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

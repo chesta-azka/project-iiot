@@ -3,10 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MachineTelemetryGateway } from './machine-telemetry/machine-telemetry.gateway';
 import { MachineHistoryController } from './machine-history/machine-history.controller';
 import { MachineAnalyticsController } from './machine-analytics/machine-analytics.controller';
+import { PdtController } from './pdt/pdt.controller';
 import { CoreEngineModule } from 'src/core-engine/core-engine.module';
 import { BreakdownEventEntity } from 'src/database/entities/breakdown-event/breakdown-event.entity';
 import { InfluxAnalyticsService } from 'src/database/influx/influx-analytics.service';
 import { MachineHistoryService } from './machine-history/machine-history.service';
+import { PdtService } from './pdt/pdt.service';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Global()
@@ -20,12 +22,14 @@ import { AuthModule } from 'src/auth/auth.module';
     controllers: [
       MachineHistoryController,
       MachineAnalyticsController,
+      PdtController,
     ],
     providers: [
       MachineTelemetryGateway,
       MachineHistoryService,
-      InfluxAnalyticsService
+      InfluxAnalyticsService,
+      PdtService,
   ],
-  exports: [MachineTelemetryGateway, MachineHistoryService],
+  exports: [MachineTelemetryGateway, MachineHistoryService, PdtService],
 })
 export class MachineApiModule {}
