@@ -39,6 +39,19 @@ export class AuthService implements OnApplicationBootstrap {
       }
 
       /**
+       * Memverifikasi password tanpa generate token (untuk fitur Unlock)
+       */
+      async validatePassword(username: string, pass: string): Promise<boolean> {
+            const user = await this.userRepository.findOne({
+                  where: { username },
+                  select: ['id', 'password'],
+            });
+
+            if (!user) return false;
+            return await bcrypt.compare(pass, user.password);
+      }
+
+      /**
        * Helper Private untuk menjaga kode tetap DRY (Don't Repeat Yourself)
        */
       private generateToken(user: UserEntity) {
@@ -68,6 +81,7 @@ export class AuthService implements OnApplicationBootstrap {
                   { username: 'manager', role: UserRole.MANAGER },
                   { username: 'supervisor', role: UserRole.SUPERVISOR },
                   { username: 'operator', role: UserRole.OPERATOR },
+                  { username: 'ppic', role: UserRole.PPIC },
             ];
 
             for (const u of defaultUsers) {

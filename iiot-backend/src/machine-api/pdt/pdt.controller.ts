@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Get, UseGuards, Request, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Param, UseGuards, Request, HttpStatus, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { PdtService } from './pdt.service';
 import { CreatePdtDto } from '../dto/create-pdt.dto';
+import { UpdatePdtDto } from '../dto/update-pdt.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -38,6 +39,29 @@ export class PdtController {
     return {
       success: true,
       data: records,
+    };
+  }
+
+  @Patch(':id/unlock')
+  @Roles(UserRole.PPIC, UserRole.MANAGER) 
+  @ApiOperation({ summary: 'Unlock dan Ubah Data PDT (Perlu konfirmasi Password)' })
+  @ApiResponse({ status: 200, description: 'Data PDT berhasil di-update dan di-unlock' })
+  @ApiResponse({ status: 401, description: 'Password Salah / Unauthorized' })
+  async unlockAndUpdate(
+    @Param('id') id: string,
+    @Body() updatePdtDto: UpdatePdtDto,
+    @Request() req: any
+  ) {
+    // Karena auth guard kita disabled (komentar sementara dari user),
+    // kita anggap user default "ppic" divalidasi. Di aslinya pakai req.user.username.
+    const username = req.user?.username || 'ppic';
+    
+    const result = await this.pdtService.unlockAndUpdatePdt(parseInt(id), updatePdtDto, username);
+    
+    return {
+      success: true,
+      message: 'Plan PDT berhasil di-edit & di-unlock',
+      data: result,
     };
   }
 }
