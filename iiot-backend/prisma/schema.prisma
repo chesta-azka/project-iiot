@@ -1,6 +1,7 @@
 // 1. Konfigurasi Generator & Datasource
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -18,9 +19,12 @@ model Machine {
   lastTemp     Float      @default(0.0)
 
   // Relasi ke Downtime
-  downtimes    Downtime[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  downtimes     Downtime[]
+  plannedDts    PlannedDowntime[]
+  logs          MachineLog[]
+  maintenanceSchedules MaintenanceSchedule[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 
@@ -54,4 +58,45 @@ model AlarmConfig {
   alarmCode    Int      @unique
   description  String
   severity     String   @default("CRITICAL") // CRITICAL, WARNING, INFO
+}
+
+// 5. TABLE PLANNED DOWNTIME (Untuk PPIC)
+model PlannedDowntime {
+  id           Int       @id @default(autoincrement())
+  
+  machineId    Int
+  machine      Machine   @relation(fields: [machineId], references: [id])
+
+  planDate     DateTime
+  duration     Int       // Durasi rencana dalam menit/detik
+  reason       String    // Misal: "Preventive Maintenance", "Cleaning"
+  
+  // Mekanisme Lock-on-Submit
+  isLocked     Boolean   @default(true)
+  submittedBy  String?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model MachineLog {
+  id           Int      @id @default(autoincrement())
+  machineId    Int
+  counterValue Int
+  temperature  Float
+  status       Int
+  createdAt    DateTime @default(now())
+  machine      Machine  @relation(fields: [machineId], references: [id])
+}
+
+
+model MaintenanceSchedule {
+  id          Int      @id @default(autoincrement())
+  machineId   Int
+  description String   // Contoh: "Ganti bearing motor utama"
+  scheduledAt DateTime // Tanggal eksekusi (minggu depan)
+  status      String   @default("PENDING") // PENDING, DONE, or OVERDUE
+  isProcessed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  machine     Machine  @relation(fields: [machineId], references: [id])
 }

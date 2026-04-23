@@ -7,9 +7,16 @@ import {
 } from 'typeorm';
 
 export enum UserRole {
+<<<<<<< HEAD
   OPERATOR = 'OPERATOR',
   SUPERVISOR = 'SUPERVISOR',
   MANAGER = 'MANAGER',
+=======
+      OPERATOR = 'OPERATOR',
+      SUPERVISOR = 'SUPERVISOR',
+      MANAGER = 'MANAGER',
+      PPIC = 'PPIC'
+>>>>>>> afgan
 }
 
 @Entity('USERS')

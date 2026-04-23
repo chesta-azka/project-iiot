@@ -151,6 +151,7 @@ export class MachineHistoryService {
         0,
       );
 
+<<<<<<< HEAD
       return {
         status: 'Success',
         line_id: 'LINE_2',
@@ -173,3 +174,106 @@ export class MachineHistoryService {
     }
   }
 }
+=======
+                        };
+                  });
+
+                  const totalDowntimeGlobal = combinedData.reduce((sum, m) => sum + m.totalDowntimeMinutes, 0)
+                  
+                  return {
+                        status: "Success",
+                        line_id: "LINE_2",
+                        totalDowntimeGlobal: totalDowntimeGlobal,
+                        shift_info: {
+                              start_from: shiftStart.toISOString(),
+                              is_live: true,
+                        },
+                        data: combinedData,
+                        metadata: {
+                              execution_time_ms: Date.now() - startTime, // Informasi kecepatan si server
+                              record_count: rawEvents.length // Angka ini menunjukan jumlah breakdowndi shift ini
+                        }
+                  };
+            } catch (error) {
+                  this.logger.error(`Failed to calculate line summary: ${error.message}`);
+                  return { data: [] }; // Return minimal object agar controller tidak crash
+            }
+      }
+
+      /**
+       * Menghitung MTBF (Mean Time Between Failures) untuk 24 jam terakhir
+       * @param machineId Opsional, filter untuk mesin tertentu
+       */
+      async getMTBFMetrics(machineId?: string) {
+            try {
+                  const now = new Date();
+                  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                  const totalPeriodMinutes = 24 * 60; // 1440 menit
+
+                  const query = this.breakdownRepo.createQueryBuilder('event')
+                        .where('event.createdAt >= :startTime', { startTime: twentyFourHoursAgo });
+
+                  if (machineId) {
+                        query.andWhere('event.machineId = :machineId', { machineId });
+                  }
+
+                  const events = await query.getMany();
+
+                  // Filter data duplikat (sama seperti di findAll/getLineSummary)
+                  const uniqueEvents = events.filter((item, index, self) =>
+                        index === self.findIndex((t) => (
+                              new Date(t.createdAt).getTime() === new Date(item.createdAt).getTime() &&
+                              t.machineId === item.machineId
+                        ))
+                  );
+
+                  const totalFailures = uniqueEvents.length;
+                  const totalDowntimeMinutes = uniqueEvents.reduce((acc, curr) => acc + (Number(curr.duration) || 0), 0);
+                  const totalUptimeMinutes = totalPeriodMinutes - totalDowntimeMinutes;
+
+                  // MTBF = Total Uptime / Number of Failures
+                  // Jika tidak ada failure, MTBF dianggap sama dengan total uptime (1440 menit)
+                  const mtbf = totalFailures > 0 
+                        ? Math.round(totalUptimeMinutes / totalFailures) 
+                        : totalUptimeMinutes;
+
+                  return {
+                        machineId: machineId || 'ALL_MACHINES',
+                        mtbfMinutes: mtbf,
+                        totalFailures,
+                        totalDowntimeMinutes,
+                        totalUptimeMinutes,
+                        periodHours: 24,
+                        timestamp: now.toISOString()
+                  };
+            } catch (error) {
+                  this.logger.error(`Gagal menghitung MTBF: ${error.message}`);
+                  throw error;
+            }
+      }
+
+      private getShiftStartTime(): Date {
+            const now = new Date();
+            const shiftStart = new Date(now);
+            const hour = now.getHours();
+
+            if (hour >= 7 && hour < 15) {
+                  // Shift 1: Mulai jam 07.00 pagi hari ini
+                  shiftStart.setHours(7, 0, 0, 0);
+
+            } else if (hour >= 15 && hour < 23) {
+                  // Shift 2: Mulai jam 15.00 sore hari ini
+                  shiftStart.setHours(15, 0, 0, 0);
+
+            } else {
+                  // Shift 3: Mulai jam 23.00 malam
+                  if (hour < 7) {
+                        // Jika jam 01.00 pagi, berarti shift mulai jam 23.00 malam KEMARIN
+                        shiftStart.setDate(shiftStart.getDate() - 1);
+                  }
+                  shiftStart.setHours(23, 0, 0, 0);
+            }
+            return shiftStart;
+      }
+}
+>>>>>>> afgan

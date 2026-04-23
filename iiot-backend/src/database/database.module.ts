@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserEntity } from './entities/user/user.entity';
 import { BreakdownEventEntity } from './entities/breakdown-event/breakdown-event.entity';
 import { InfluxService } from './influx/influx.service';
+import { PrismaService } from './prisma.service';
 
 /**
  * PROJECT IIOT - DATABASE MODULE (POV: GUA)
@@ -35,11 +36,26 @@ import { InfluxService } from './influx/influx.service';
     TypeOrmModule.forFeature([UserEntity, BreakdownEventEntity]),
   ],
 
+<<<<<<< HEAD
   // InfluxDB masuk sini juga biar satu pintu urusan data
   providers: [InfluxService],
 
   // Export semuanya biar modul kayak 'MachineModule' tinggal pake
   exports: [TypeOrmModule, InfluxService],
+=======
+      // InfluxDB masuk sini juga biar satu pintu urusan data
+      providers: [
+            InfluxService,
+            PrismaService
+      ],
+
+      // Export semuanya biar modul kayak 'MachineModule' tinggal pake
+      exports: [
+            TypeOrmModule,
+            InfluxService,
+            PrismaService
+      ],
+>>>>>>> afgan
 })
 export class DatabaseModule {
   constructor() {
