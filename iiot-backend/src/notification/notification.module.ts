@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { MailerModule } from '@nestjs/nestjs-mailer';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailService } from './email.service';
 

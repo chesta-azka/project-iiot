@@ -9,6 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 import { Module, NestModule, MiddlewareConsumer, Logger, RequestMethod } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware'
 import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { NotificationModule } from './notification/notification.module';
     CoreEngineModule,
     SimulatorModule,
     NotificationModule,
+    ScheduleModule.forRoot(),
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

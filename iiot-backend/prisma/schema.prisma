@@ -1,6 +1,7 @@
 // 1. Konfigurasi Generator & Datasource
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -20,6 +21,8 @@ model Machine {
   // Relasi ke Downtime
   downtimes     Downtime[]
   plannedDts    PlannedDowntime[]
+  logs          MachineLog[]
+  maintenanceSchedules MaintenanceSchedule[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
@@ -72,4 +75,26 @@ model PlannedDowntime {
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model MachineLog {
+  id           Int      @id @default(autoincrement())
+  machineId    Int
+  counterValue Int
+  temperature  Float
+  status       Int
+  createdAt    DateTime @default(now())
+  machine      Machine  @relation(fields: [machineId], references: [id])
+}
+
+
+model MaintenanceSchedule {
+  id          Int      @id @default(autoincrement())
+  machineId   Int
+  description String   // Contoh: "Ganti bearing motor utama"
+  scheduledAt DateTime // Tanggal eksekusi (minggu depan)
+  status      String   @default("PENDING") // PENDING, DONE, or OVERDUE
+  isProcessed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  machine     Machine  @relation(fields: [machineId], references: [id])
 }
