@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import * as Modbus from 'jsmodbus';
 import * as net from 'net';
 import { interval, Subscription, Subject, filter, exhaustMap } from 'rxjs';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../database/prisma.service';
 
 /**
  * Interface data mesin hasil parsing

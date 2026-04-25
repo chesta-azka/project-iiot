@@ -23,11 +23,11 @@ services:
       - influxdb_data:/var/lib/influxdb
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
-      DOCKER_INFLUXDB_INIT_USERNAME: admin_user
-      DOCKER_INFLUXDB_INIT_PASSWORD: strongpassword
-      DOCKER_INFLUXDB_INIT_ORG: ChestaCorp
-      DOCKER_INFLUXDB_INIT_BUCKET: iiot_raw_data
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: 98aWAgEFGJqIZXGrmRr1IQe47TkquE5QMpWapB_gmiyTf8vs6st8chDg1G0ua_RpfI3hLtu4RgpDMjUibEef8A==
+      DOCKER_INFLUXDB_INIT_USERNAME: user_iiot
+      DOCKER_INFLUXDB_INIT_PASSWORD: securepassword
+      DOCKER_INFLUXDB_INIT_ORG: chesta-iiot
+      DOCKER_INFLUXDB_INIT_BUCKET: iiot-telemetry
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: pA9rY_xW8LqVnU5mK2tZ1jB7hG4sX0cY3dE6fR9vT8==
     restart: always
 
   backend:
@@ -39,15 +39,15 @@ services:
       - "4005:3005"
       - "4006:3006"
     volumes:
-      - .:/usr/src/app 
-      - /usr/src/app/node_modules 
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       - influxdb
       - postgres
     environment:
-      POSTGRES_HOST: postgres  
+      POSTGRES_HOST: postgres
       INFLUX_HOST: influxdb
-      INFLUX_TOKEN: 98aWAgEFGJqIZXGrmRr1IQe47TkquE5QMpWapB_gmiyTf8vs6st8chDg1G0ua_RpfI3hLtu4RgpDMjUibEef8A==
+      INFLUX_TOKEN: pA9rY_xW8LqVnU5mK2tZ1jB7hG4sX0cY3dE6fR9vT8==
     restart: always
 
 volumes:

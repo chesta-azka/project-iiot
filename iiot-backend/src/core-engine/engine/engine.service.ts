@@ -9,18 +9,13 @@ import { InfluxService } from '../../database/influx/influx.service';
 import { MachineTelemetryGateway } from 'src/machine-api/machine-telemetry/machine-telemetry.gateway';
 import { MachineRegisters } from 'src/simulator/modbus-simulator/modbus-simulator.service';
 import { ShiftService } from '../shift/shift.service';
-<<<<<<< HEAD
-import { PrismaService } from '../../../prisma/prisma.service';
-// IMPORT SERVICE MODBUS (Sesuaikan path jika beda folder)
+import { PrismaService } from '../../database/prisma.service';
 import {
   ModbusClientService,
   MachineData,
 } from '../../simulator/modbus-client/modbus-client.service';
-=======
-import { machine } from 'os';
 import { EmailService } from 'src/notification/email.service';
 import { ConfigService } from '@nestjs/config';
->>>>>>> afgan
 
 interface MachineStateTracker {
   isRunning: boolean;
@@ -51,22 +46,12 @@ export class RealTimeEngineService implements OnModuleInit {
     private readonly prisma: PrismaService,
     // Dependency Injection Modbus Service
     private readonly modbusService: ModbusClientService,
+    private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
   ) {}
 
-<<<<<<< HEAD
   onModuleInit() {
     this.logger.log(`[Engine] Multi-Machine RealTime Engine Initialized.`);
-=======
-      constructor(
-            @InjectRepository(BreakdownEventEntity)
-            private readonly breakdownRepository: Repository<BreakdownEventEntity>,
-            private readonly influxService: InfluxService,
-            private readonly telemetryGateway: MachineTelemetryGateway,
-            private readonly shiftService: ShiftService,
-            private readonly emailService: EmailService,
-            private readonly configService: ConfigService
-      ) { }
->>>>>>> afgan
 
     // LOGIC DARI LU: Subscribe data Modbus
     this.modbusService.machineData$.subscribe((data: any[]) => {
@@ -126,7 +111,6 @@ export class RealTimeEngineService implements OnModuleInit {
 
       tracker.latestAlarmCode = rawData.ALARM_CODE;
 
-<<<<<<< HEAD
       if (!isCurrentlyRunning) {
         if (previousState === true) {
           this.handleStopEvent(machineId, tracker);
@@ -139,71 +123,6 @@ export class RealTimeEngineService implements OnModuleInit {
                 machineId: machine.id,
                 startTime: new Date(),
               },
-=======
-                  // 4. Update state terakhir
-                  tracker.isRunning = isCurrentlyRunning;
-                  tracker.lastBottleCount = rawData.BOTTLE_COUNTER;
-
-            } catch (err) {
-                  this.logger.error(`[Engine Error] Critical error on ${machineId}: ${err.message}`);
-            }
-      }
-
-      private handleStopEvent(machineId: string, tracker: MachineStateTracker): void {
-            tracker.upstCount += 1;
-            tracker.updtStartTime = new Date();
-            this.logger.warn(`[DOWN] ${machineId} - Alarm: ${tracker.latestAlarmCode}`);
-
-            // Kirim notifikasi via Email jika mesin mati karena Alarm (Kode Alarm bukan 0)
-            if (tracker.latestAlarmCode !== 0) {
-                  const targetEmail = this.configService.get<string>('ALERT_TARGET_EMAIL', 'spv.produksi@aqua.com');
-                  this.emailService.sendAlertEmail(
-                        targetEmail,
-                        machineId,
-                        tracker.machineName,
-                        `Mesin terdeteksi STOP karena terjadi suatu error. Kode Alarm yang tertangkap adalah: ${tracker.latestAlarmCode}. Mohon segera periksa ke lokasi (Line).`,
-                        tracker.latestAlarmCode
-                  );
-            }
-      }
-
-      private async handleRestartEvent(machineId: string, tracker: MachineStateTracker, shiftName: string): Promise<void> {
-            if (tracker.isSaving) return;
-
-            const durationMs = tracker.currentUpdtDurationMs;
-
-            // Validasi: Simpan ke Postgres hanya jika downtime > 2 detik (mencegah noise data)
-            if (durationMs >= 2000) {
-                  tracker.isSaving = true;
-                  try {
-                        this.logger.log(`[UP] ${machineId} restarted after ${(durationMs / 1000).toFixed(1)}s`);
-                        await this.saveBreakdownToPostgres(machineId, tracker, durationMs, shiftName);
-                  } catch (e) {
-                        this.logger.error(`Failed to save breakdown: ${e.message}`);
-                  } finally {
-                        // RESET SEMUA DI SINI
-                        tracker.isSaving = false;
-                        tracker.currentUpdtDurationMs = 0;
-                        tracker.updtStartTime = null;
-                  }
-            } else {
-                  // Jika mati sebentar banget, lupakan saja (Bouncing data)
-                  tracker.currentUpdtDurationMs = 0;
-                  tracker.updtStartTime = null;
-            }
-      }
-
-      private broadcastTelemetry(machineId: string, tracker: MachineStateTracker, rawData: MachineRegisters, shiftName: string): void {
-            this.telemetryGateway.sendToFrontend({
-                  machineId: machineId,
-                  machineName: tracker.machineName,
-                  status: tracker.isRunning ? 'RUNNING' : 'STOPPED',
-                  counter: rawData.BOTTLE_COUNTER,
-                  alarm: rawData.ALARM_CODE,
-                  updtSeconds: (tracker.currentUpdtDurationMs / 1000).toFixed(1),
-                  shift: shiftName,
-                  upstCount: tracker.upstCount
->>>>>>> afgan
             });
           }
         }
@@ -261,13 +180,25 @@ export class RealTimeEngineService implements OnModuleInit {
     }
   }
 
-  private handleStopEvent(
-    machineId: string,
-    tracker: MachineStateTracker,
-  ): void {
+  private handleStopEvent(machineId: string, tracker: MachineStateTracker): void {
     tracker.upstCount += 1;
     tracker.updtStartTime = new Date();
     this.logger.warn(`[DOWN] ${machineId} - Alarm: ${tracker.latestAlarmCode}`);
+
+    // Kirim notifikasi via Email jika mesin mati karena Alarm (Kode Alarm bukan 0)
+    if (tracker.latestAlarmCode !== 0) {
+      const targetEmail = this.configService.get<string>(
+        'ALERT_TARGET_EMAIL',
+        'spv.produksi@aqua.com',
+      );
+      this.emailService.sendAlertEmail(
+        targetEmail,
+        machineId,
+        tracker.machineName,
+        `Mesin terdeteksi STOP karena terjadi suatu error. Kode Alarm yang tertangkap adalah: ${tracker.latestAlarmCode}. Mohon segera periksa ke lokasi (Line).`,
+        tracker.latestAlarmCode,
+      );
+    }
   }
 
   private async handleRestartEvent(

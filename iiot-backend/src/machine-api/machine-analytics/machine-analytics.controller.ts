@@ -83,7 +83,6 @@ export class MachineAnalyticsController {
     };
   }
 
-<<<<<<< HEAD
   /**
    * PRODUCTION TREND
    * Mengambil data time-series dari InfluxDB untuk grafik (Chart.js/ApexCharts)
@@ -112,44 +111,22 @@ export class MachineAnalyticsController {
       window,
     );
   }
-}
-=======
-        /**
-         * PRODUCTION TREND
-         * Mengambil data time-series dari InfluxDB untuk grafik (Chart.js/ApexCharts)
-         */
-        @Get('trend')
-        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.MANAGER)
-        @ApiOperation({ summary: 'Mendapatkan trend produksi/telemetri dari InfluxDB' })
-        @ApiQuery({ name: 'machineId', required: true, example: 'FILLER-01' })
-        @ApiQuery({ name: 'range', required: false, example: '-1h', description: 'Range waktu (e.g. -1h, -24h, -7d)' })
-        async getTrend(
-                @Query('machineId') machineId: string,
-                @Query('range') range: string = '-1h',
-                @Query('window') window: string = '1m',
-        ) {
-                this.logger.log(`Fetching trend analytics for: ${machineId}`);
-                return await this.influxAnalyticsService.getProductionTrend(machineId, range, window);
-        }
 
-        /**
-         * MTBF (Mean Time Between Failures)
-         * Menghitung nilai keandalan mesin dalam 24 jam terakhir
-         */
-        @Get('mtbf')
-        @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.MANAGER)
-        @ApiOperation({ summary: 'Mendapatkan metrik MTBF untuk 24 jam terakhir' })
-        @ApiQuery({ name: 'machineId', required: false, example: 'FILLER-01' })
-        @ApiResponse({ status: 200, description: 'Data MTBF berhasil dihitung' })
-        async getMTBF(
-                @Query('machineId') machineId?: string,
-        ) {
-                this.logger.log(`Calculating MTBF for: ${machineId || 'ALL_MACHINES'}`);
-                const data = await this.historyService.getMTBFMetrics(machineId);
-                return {
-                        success: true,
-                        data
-                };
-        }
+  /**
+   * MTBF (Mean Time Between Failures)
+   * Menghitung nilai keandalan mesin dalam 24 jam terakhir
+   */
+  @Get('mtbf')
+  @Roles(UserRole.OPERATOR, UserRole.SUPERVISOR, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Mendapatkan metrik MTBF untuk 24 jam terakhir' })
+  @ApiQuery({ name: 'machineId', required: false, example: 'FILLER-01' })
+  @ApiResponse({ status: 200, description: 'Data MTBF berhasil dihitung' })
+  async getMTBF(@Query('machineId') machineId?: string) {
+    this.logger.log(`Calculating MTBF for: ${machineId || 'ALL_MACHINES'}`);
+    const data = await this.historyService.getMTBFMetrics(machineId);
+    return {
+      success: true,
+      data,
+    };
+  }
 }
->>>>>>> afgan

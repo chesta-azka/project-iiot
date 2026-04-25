@@ -36,26 +36,11 @@ import { PrismaService } from './prisma.service';
     TypeOrmModule.forFeature([UserEntity, BreakdownEventEntity]),
   ],
 
-<<<<<<< HEAD
-  // InfluxDB masuk sini juga biar satu pintu urusan data
-  providers: [InfluxService],
+  // InfluxDB & Prisma masuk sini juga biar satu pintu urusan data
+  providers: [InfluxService, PrismaService],
 
   // Export semuanya biar modul kayak 'MachineModule' tinggal pake
-  exports: [TypeOrmModule, InfluxService],
-=======
-      // InfluxDB masuk sini juga biar satu pintu urusan data
-      providers: [
-            InfluxService,
-            PrismaService
-      ],
-
-      // Export semuanya biar modul kayak 'MachineModule' tinggal pake
-      exports: [
-            TypeOrmModule,
-            InfluxService,
-            PrismaService
-      ],
->>>>>>> afgan
+  exports: [TypeOrmModule, InfluxService, PrismaService],
 })
 export class DatabaseModule {
   constructor() {

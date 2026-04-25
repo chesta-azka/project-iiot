@@ -1,18 +1,17 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
-    // Kuncinya: Prisma v7 minta 'datasources' di dalam constructor 
-    // kalau env DATABASE_URL terdeteksi kosong/undefined.
-    super({
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL || "postgresql://user_iiot:securepassword@localhost:5433/iiot_events_db?schema=public",
-        },
-      },
-    } as any); 
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg(pool);
+    super({ adapter, log: ['error'] });
   }
 
   async onModuleInit() {

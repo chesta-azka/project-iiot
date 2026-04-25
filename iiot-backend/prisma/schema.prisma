@@ -1,6 +1,5 @@
-// 1. Konfigurasi Generator & Datasource
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "library"
 }
 
@@ -8,75 +7,55 @@ datasource db {
   provider = "postgresql"
 }
 
-// 2. TABLE MASTER MESIN (Mapping dari MODBUS)
 model Machine {
-  id           Int        @id @default(autoincrement())
-  machineId    String     @unique // Contoh: "AQ-BLW-01"
-  name         String
-  baseRegister Int        @unique // Offset 0, 100, 200, dll
-  status       Int        @default(0) // 1: RUN, 0: STOP
-  lastCounter  Int        @default(0)
-  lastTemp     Float      @default(0.0)
-
-  // Relasi ke Downtime
-  downtimes     Downtime[]
-  plannedDts    PlannedDowntime[]
-  logs          MachineLog[]
+  id                   Int                   @id @default(autoincrement())
+  machineId            String                @unique
+  name                 String
+  baseRegister         Int                   @unique
+  status               Int                   @default(0)
+  lastCounter          Int                   @default(0)
+  lastTemp             Float                 @default(0.0)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  downtimes            Downtime[]
+  logs                 MachineLog[]
   maintenanceSchedules MaintenanceSchedule[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  plannedDts           PlannedDowntime[]
 }
 
-
-// 4. TABLE LOG DOWNTIME (Buat Operator & Supervisor)
 model Downtime {
   id           Int       @id @default(autoincrement())
-  
-  // Relasi: Harus ada kolom ID (Int) dan field Model (Machine)
   machineId    Int
-  machine      Machine   @relation(fields: [machineId], references: [id])
-
   startTime    DateTime  @default(now())
   endTime      DateTime?
-  duration     Int?      // Duration dalam detik
-
-  // PDT vs UPDT: false = Unplanned (UPDT), true = Planned (PDT)
+  duration     Int?
   isPlanned    Boolean   @default(false)
-
-  // Meta Data
   operatorNote String?
   isApproved   Boolean   @default(false)
   approvedBy   String?
-
   createdAt    DateTime  @default(now())
-}
-
-
-// 4. TABLE SETTINGS / ALARM CONFIG (Opsional)
-model AlarmConfig {
-  id           Int      @id @default(autoincrement())
-  alarmCode    Int      @unique
-  description  String
-  severity     String   @default("CRITICAL") // CRITICAL, WARNING, INFO
-}
-
-// 5. TABLE PLANNED DOWNTIME (Untuk PPIC)
-model PlannedDowntime {
-  id           Int       @id @default(autoincrement())
-  
-  machineId    Int
+  reason       String?
   machine      Machine   @relation(fields: [machineId], references: [id])
+}
 
-  planDate     DateTime
-  duration     Int       // Durasi rencana dalam menit/detik
-  reason       String    // Misal: "Preventive Maintenance", "Cleaning"
-  
-  // Mekanisme Lock-on-Submit
-  isLocked     Boolean   @default(true)
-  submittedBy  String?
+model AlarmConfig {
+  id          Int    @id @default(autoincrement())
+  alarmCode   Int    @unique
+  description String
+  severity    String @default("CRITICAL")
+}
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+model PlannedDowntime {
+  id          Int      @id @default(autoincrement())
+  machineId   Int
+  planDate    DateTime
+  duration    Int
+  reason      String
+  isLocked    Boolean  @default(true)
+  submittedBy String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  machine     Machine  @relation(fields: [machineId], references: [id])
 }
 
 model MachineLog {
@@ -89,14 +68,37 @@ model MachineLog {
   machine      Machine  @relation(fields: [machineId], references: [id])
 }
 
-
 model MaintenanceSchedule {
   id          Int      @id @default(autoincrement())
   machineId   Int
-  description String   // Contoh: "Ganti bearing motor utama"
-  scheduledAt DateTime // Tanggal eksekusi (minggu depan)
-  status      String   @default("PENDING") // PENDING, DONE, or OVERDUE
+  description String
+  scheduledAt DateTime
+  status      String   @default("PENDING")
   isProcessed Boolean  @default(false)
   createdAt   DateTime @default(now())
   machine     Machine  @relation(fields: [machineId], references: [id])
+}
+
+model USERS {
+  id        Int             @id(map: "PK_b16c39a00c89083529c6166fa5b") @default(autoincrement())
+  username  String          @unique(map: "UQ_055984372b62f71f274f3fe361a") @db.VarChar
+  password  String          @db.VarChar
+  role      USERS_role_enum @default(OPERATOR)
+  createdAt DateTime        @default(now()) @db.Timestamp(6)
+}
+
+model breakdown_events {
+  id            Int      @id(map: "PK_a63fb9c07207480457c3d617292") @default(autoincrement())
+  machineId     String   @db.VarChar
+  machineName   String   @default("Unknown Machine") @db.VarChar
+  ErrorMessages String   @default("No error message provided ") @db.VarChar
+  duration      Int
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+}
+
+enum USERS_role_enum {
+  OPERATOR
+  SUPERVISOR
+  MANAGER
+  PPIC
 }

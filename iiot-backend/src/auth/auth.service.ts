@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserEntity, UserRole } from '../database/entities/user/user.entity'; // Pastikan path ini sesuai
+import { UserEntity, UserRole } from '../database/entities/user/user.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -63,11 +63,11 @@ export class AuthService implements OnApplicationBootstrap {
    * Fungsi untuk membuat user default (Admin, Engineer, Operator)
    */
   async seedUsers() {
-    // Asumsi UserRole adalah tipe Enum/String di Entity lu.
     const defaultUsers = [
       { username: 'manager', role: UserRole.MANAGER },
       { username: 'supervisor', role: UserRole.SUPERVISOR },
       { username: 'operator', role: UserRole.OPERATOR },
+      { username: 'ppic', role: UserRole.PPIC },
     ];
 
     for (const u of defaultUsers) {
@@ -88,73 +88,19 @@ export class AuthService implements OnApplicationBootstrap {
           `✅ Seeded default user: ${u.username} (Role: ${u.role})`,
         );
       }
-<<<<<<< HEAD
     }
   }
+
+  /**
+   * Memverifikasi password tanpa generate token (untuk fitur Unlock)
+   */
+  async validatePassword(username: string, pass: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { username },
+      select: ['id', 'password'],
+    });
+
+    if (!user) return false;
+    return await bcrypt.compare(pass, user.password);
+  }
 }
-=======
-
-      /**
-       * Memverifikasi password tanpa generate token (untuk fitur Unlock)
-       */
-      async validatePassword(username: string, pass: string): Promise<boolean> {
-            const user = await this.userRepository.findOne({
-                  where: { username },
-                  select: ['id', 'password'],
-            });
-
-            if (!user) return false;
-            return await bcrypt.compare(pass, user.password);
-      }
-
-      /**
-       * Helper Private untuk menjaga kode tetap DRY (Don't Repeat Yourself)
-       */
-      private generateToken(user: UserEntity) {
-            const payload = { sub: user.id, username: user.username, role: user.role };
-            return {
-                  access_token: this.jwtService.sign(payload),
-                  user: {
-                        username: user.username,
-                        role: user.role,
-                  },
-            };
-      }
-
-      /**
-       * Fungsi ini otomatis jalan pas NestJS start
-       */
-      async onApplicationBootstrap() {
-            await this.seedUsers();
-      }
-
-      /**
-       * Fungsi untuk membuat user default (Admin, Engineer, Operator)
-       */
-      async seedUsers() {
-            // Asumsi UserRole adalah tipe Enum/String di Entity lu.
-            const defaultUsers = [
-                  { username: 'manager', role: UserRole.MANAGER },
-                  { username: 'supervisor', role: UserRole.SUPERVISOR },
-                  { username: 'operator', role: UserRole.OPERATOR },
-                  { username: 'ppic', role: UserRole.PPIC },
-            ];
-
-            for (const u of defaultUsers) {
-                  const userExist = await this.userRepository.findOne({ where: { username: u.username } });
-
-                  if (!userExist) {
-                        const hashedPassword = await bcrypt.hash('AQUA123', this.SALT_ROUNDS);
-                        const newUser = this.userRepository.create({
-                              username: u.username,
-                              password: hashedPassword,
-                              role: u.role,
-                        });
-
-                        await this.userRepository.save(newUser);
-                        this.logger.log(`✅ Seeded default user: ${u.username} (Role: ${u.role})`);
-                  }
-            }
-      }
-}
->>>>>>> afgan

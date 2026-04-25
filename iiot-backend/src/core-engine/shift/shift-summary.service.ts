@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '../../database/prisma.service';
 import { ShiftService, ShiftDefinition, HourWindow } from './shift.service';
 import { RealTimeEngineService } from '../engine/engine.service';
 
