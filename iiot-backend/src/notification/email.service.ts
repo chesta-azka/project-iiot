@@ -8,15 +8,17 @@ export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendAlertEmail(
-    to: string, 
-    machineId: string, 
-    machineName: string, 
-    message: string, 
-    alarmCode: number | string
+    to: string,
+    machineId: string,
+    machineName: string,
+    message: string,
+    alarmCode: number | string,
   ): Promise<void> {
     try {
-      this.logger.log(`Sending alert email to ${to} for machine ${machineName} (${machineId})...`);
-      
+      this.logger.log(
+        `Sending alert email to ${to} for machine ${machineName} (${machineId})...`,
+      );
+
       await this.mailerService.sendMail({
         to: to,
         subject: `🚨 [ALERT] Critical Issue - ${machineName} (${machineId})`,

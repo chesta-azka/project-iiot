@@ -21,7 +21,7 @@ import { RealTimeEngineService } from 'src/core-engine/engine/engine.service';
 export class PageScreenDeliveryController {
   private readonly logger = new Logger(PageScreenDeliveryController.name);
 
-  constructor(private readonly engineService: RealTimeEngineService) { }
+  constructor(private readonly engineService: RealTimeEngineService) {}
 
   @Get(':lineId')
   @HttpCode(HttpStatus.OK)

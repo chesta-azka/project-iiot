@@ -45,7 +45,7 @@ export class PageMachineStatusController {
 
     const machineStatuses = await Promise.all(
       liveMachines.map(async (m) => {
-        let statusCountText =
+        const statusCountText =
           m.upstCount > 0 ? `${m.upstCount} Stops` : 'Running';
         const shiftData = await this.shiftSummaryService.getCurrentShiftSummary(
           m.machineId,

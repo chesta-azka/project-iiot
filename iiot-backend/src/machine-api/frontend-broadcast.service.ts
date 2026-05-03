@@ -74,7 +74,7 @@ export class FrontendBroadcastService implements OnModuleInit, OnModuleDestroy {
       // 3. Machine Statuses Update (Selengkapnya, with hover PR and Counts)
       const machineStatuses = await Promise.all(
         liveMachines.map(async (m) => {
-          let statusCountText =
+          const statusCountText =
             m.upstCount > 0 ? `${m.upstCount} Stops` : 'Running';
           // Kita bisa fetch daily pr dari shift summary service
           const shiftData =

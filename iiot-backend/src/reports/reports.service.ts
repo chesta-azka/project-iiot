@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../database/prisma.service';
 import * as ExcelJS from 'exceljs';
-import PDFDocument = require('pdfkit');
+import PDFDocument from 'pdfkit';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -11,13 +11,15 @@ export class ReportsService implements OnModuleInit {
   private readonly logger = new Logger(ReportsService.name);
   private readonly reportDir = path.join(process.cwd(), 'storage', 'reports');
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async onModuleInit() {
     // Memastikan folder storage siap pakai saat aplikasi running
     if (!fs.existsSync(this.reportDir)) {
       fs.mkdirSync(this.reportDir, { recursive: true });
-      this.logger.log(`📁 Folder laporan berhasil dibuat di: ${this.reportDir}`);
+      this.logger.log(
+        `📁 Folder laporan berhasil dibuat di: ${this.reportDir}`,
+      );
     }
   }
 
@@ -26,10 +28,17 @@ export class ReportsService implements OnModuleInit {
   // ======================================================
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleAutomatedDailyReport() {
-    this.logger.log('🚀 [CRON] Menjalankan pembuatan laporan harian otomatis...');
+    this.logger.log(
+      '🚀 [CRON] Menjalankan pembuatan laporan harian otomatis...',
+    );
     try {
-      const path = await this.generateReportLogic('excel', true);
-      this.logger.log(`✅ [CRON] Laporan harian berhasil disimpan: ${path}`);
+      const filePath = (await this.generateReportLogic(
+        'excel',
+        true,
+      )) as string;
+      this.logger.log(
+        `✅ [CRON] Laporan harian berhasil disimpan: ${filePath}`,
+      );
     } catch (err) {
       this.logger.error('❌ [CRON] Gagal membuat laporan otomatis', err.stack);
     }
@@ -43,7 +52,7 @@ export class ReportsService implements OnModuleInit {
     this.logger.log('🔍 [ANALYSIS] Memulai scan anomali mesin...');
     try {
       const oneHourAgo = new Date(Date.now() - 3600000);
-      
+
       // Ambil data mesin yang sering mati/alarm dalam 1 jam terakhir
       const anomalies = await this.prisma.machineLog.groupBy({
         by: ['machineId'],
@@ -57,7 +66,9 @@ export class ReportsService implements OnModuleInit {
       for (const data of anomalies) {
         const count = data._count.status;
         if (count > 5) {
-          const machine = await this.prisma.machine.findUnique({ where: { id: data.machineId } });
+          const machine = await this.prisma.machine.findUnique({
+            where: { id: data.machineId },
+          });
           this.logger.warn(
             `⚠️ ALERT: Mesin "${machine?.name || data.machineId}" terdeteksi tidak stabil! (${count} stop dalam 1 jam).`,
           );
@@ -97,7 +108,7 @@ export class ReportsService implements OnModuleInit {
         this.logger.warn(
           `🛠️ PENGINGAT MAINTENANCE: Mesin ${task.machine?.name} - Deskripsi: ${task.description}`,
         );
-        
+
         // Tandai sudah diproses agar tidak muncul di scan berikutnya
         await this.prisma.maintenanceSchedule.update({
           where: { id: task.id },
@@ -112,19 +123,31 @@ export class ReportsService implements OnModuleInit {
   // ======================================================
   // 4. CORE LOGIC: GENERATE REPORT (Bisa Manual Via API)
   // ======================================================
-  async generateReportLogic(format: 'excel' | 'pdf', saveToFile: boolean) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
+  // Tambahkan parameter 'range'
+  async generateReportLogic(
+    format: 'excel' | 'pdf',
+    saveToFile: boolean,
+    range: 'hour' | 'day' | 'week' | 'month' = 'day' // <-- Tambahin ini
+  ) {
+    const startDate = new Date();
+
+    // Logic dinamis berdasarkan range
+    if (range === 'hour') startDate.setHours(startDate.getHours() - 1);
+    else if (range === 'day') startDate.setHours(0, 0, 0, 0);
+    else if (range === 'week') startDate.setDate(startDate.getDate() - 7);
+    else if (range === 'month') startDate.setMonth(startDate.getMonth() - 1);
 
     const logs = await this.prisma.machineLog.findMany({
-      where: { createdAt: { gte: yesterday } },
+      where: { createdAt: { gte: startDate } },
       include: { machine: true },
       orderBy: { createdAt: 'asc' },
     });
 
-    const timestamp = new Date().toISOString().split('T')[0];
-    const fileName = `Report-${timestamp}-${Math.floor(Math.random() * 1000)}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+    // Jika data kosong, langsung return null (biar ditangkep safety check di Controller)
+    if (logs.length === 0) return null;
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = `AQUA_Report_${range}_${timestamp}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
     const fullPath = path.join(this.reportDir, fileName);
 
     if (format === 'excel') {
@@ -182,35 +205,49 @@ export class ReportsService implements OnModuleInit {
       await workbook.xlsx.writeFile(filePath);
       return filePath;
     }
-    return await workbook.xlsx.writeBuffer();
+    // writeBuffer() returns ArrayBuffer — must convert to Buffer properly
+    const arrayBuffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(arrayBuffer);
   }
 
   // ======================================================
   // 6. HELPER: PDF BUILDER
   // ======================================================
-  private async buildPdf(logs: any[], filePath: string | null): Promise<Buffer | string> {
+  private buildPdf(
+    logs: any[],
+    filePath: string | null,
+  ): Promise<Buffer | string> {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({ size: 'A4', margin: 50 });
-      let buffers: Buffer[] = [];
+      const buffers: Buffer[] = [];
 
+      // ── Setup output BEFORE writing any content ──────────────────────────
       if (filePath) {
         const stream = fs.createWriteStream(filePath);
         doc.pipe(stream);
+        doc.on('error', reject);
         stream.on('finish', () => resolve(filePath));
         stream.on('error', reject);
       } else {
-        doc.on('data', (chunk) => buffers.push(chunk));
+        // Must be attached before doc.end() so no chunk is missed
+        doc.on('data', (chunk: Buffer) => buffers.push(chunk));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
+        doc.on('error', reject);
       }
 
-      // PDF Styling
-      doc.fillColor('#2c3e50').fontSize(20).text('AQUA IIOT PRODUCTION REPORT', { align: 'center' });
-      doc.fontSize(10).text(`Periode: ${new Date().toLocaleDateString()}`, { align: 'center' });
+      // ── PDF Content ──────────────────────────────────────────────────────
+      doc
+        .fillColor('#2c3e50')
+        .fontSize(20)
+        .text('AQUA IIOT PRODUCTION REPORT', { align: 'center' });
+      doc.fontSize(10).text(`Periode: ${new Date().toLocaleDateString('id-ID')}`, {
+        align: 'center',
+      });
       doc.moveDown();
       doc.moveTo(50, 100).lineTo(550, 100).stroke();
       doc.moveDown();
 
-      // Table Header Manual
+      // Table Header
       const tableTop = 130;
       doc.fontSize(10).font('Helvetica-Bold');
       doc.text('No', 50, tableTop);
@@ -239,9 +276,16 @@ export class ReportsService implements OnModuleInit {
         doc.text(log.status === 1 ? 'RUN' : 'STOP', 500, currentY);
 
         currentY += 15;
-        doc.moveTo(50, currentY - 2).lineTo(550, currentY - 2).strokeColor('#ecf0f1').lineWidth(0.5).stroke().strokeColor('#000');
+        doc
+          .moveTo(50, currentY - 2)
+          .lineTo(550, currentY - 2)
+          .strokeColor('#ecf0f1')
+          .lineWidth(0.5)
+          .stroke()
+          .strokeColor('#000');
       });
 
+      // Finalize — triggers 'end' / 'finish' events
       doc.end();
     });
   }
@@ -252,11 +296,13 @@ export class ReportsService implements OnModuleInit {
   async getExistingReports() {
     try {
       const files = fs.readdirSync(this.reportDir);
-      return files.map(file => ({
-        fileName: file,
-        size: fs.statSync(path.join(this.reportDir, file)).size,
-        createdAt: fs.statSync(path.join(this.reportDir, file)).birthtime
-      })).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      return files
+        .map((file) => ({
+          fileName: file,
+          size: fs.statSync(path.join(this.reportDir, file)).size,
+          createdAt: fs.statSync(path.join(this.reportDir, file)).birthtime,
+        }))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } catch (err) {
       this.logger.error('Gagal mengambil daftar file laporan', err.stack);
       return [];

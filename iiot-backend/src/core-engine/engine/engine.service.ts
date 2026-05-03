@@ -29,6 +29,7 @@ interface MachineStateTracker {
   isSaving?: boolean;
   currentOperator?: string;
   pr?: number; // Tambahkan field pr di tracker
+  lastLogTimestamp?: number;
 }
 
 @Injectable()
@@ -48,7 +49,7 @@ export class RealTimeEngineService implements OnModuleInit {
     private readonly modbusService: ModbusClientService,
     private readonly emailService: EmailService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   onModuleInit() {
     this.logger.log(`[Engine] Multi-Machine RealTime Engine Initialized.`);
@@ -84,6 +85,7 @@ export class RealTimeEngineService implements OnModuleInit {
         isSaving: false,
         machineName: machineName || `Machine ${machineId}`,
         pr: 0,
+        lastLogTimestamp: 0,
       });
       this.lastProcessTimestamp.set(machineId, Date.now());
     }
@@ -173,6 +175,23 @@ export class RealTimeEngineService implements OnModuleInit {
 
       tracker.isRunning = isCurrentlyRunning;
       tracker.lastBottleCount = rawData.BOTTLE_COUNTER;
+
+      const lastLogTs = tracker.lastLogTimestamp || 0;
+      // Log data setiap 1 menit (60000ms) ke MachineLog agar Reports punya data
+      if (now - lastLogTs >= 60000) {
+        tracker.lastLogTimestamp = now;
+        const machine = await this.prisma.machine.findUnique({ where: { machineId: machineId } });
+        if (machine) {
+          await this.prisma.machineLog.create({
+            data: {
+              machineId: machine.id,
+              counterValue: rawData.BOTTLE_COUNTER || 0,
+              temperature: (rawData as any).temp || 0,
+              status: isCurrentlyRunning ? 1 : 0
+            }
+          });
+        }
+      }
     } catch (err) {
       this.logger.error(
         `[Engine Error] Critical error on ${machineId}: ${err.message}`,
@@ -180,7 +199,10 @@ export class RealTimeEngineService implements OnModuleInit {
     }
   }
 
-  private handleStopEvent(machineId: string, tracker: MachineStateTracker): void {
+  private handleStopEvent(
+    machineId: string,
+    tracker: MachineStateTracker,
+  ): void {
     tracker.upstCount += 1;
     tracker.updtStartTime = new Date();
     this.logger.warn(`[DOWN] ${machineId} - Alarm: ${tracker.latestAlarmCode}`);
