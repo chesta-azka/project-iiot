@@ -123,11 +123,10 @@ export class ReportsService implements OnModuleInit {
   // ======================================================
   // 4. CORE LOGIC: GENERATE REPORT (Bisa Manual Via API)
   // ======================================================
-  // Tambahkan parameter 'range'
   async generateReportLogic(
     format: 'excel' | 'pdf',
     saveToFile: boolean,
-    range: 'hour' | 'day' | 'week' | 'month' = 'day' // <-- Tambahin ini
+    range: 'hour' | 'day' | 'week' | 'month' = 'day'
   ) {
     const startDate = new Date();
 
@@ -164,48 +163,103 @@ export class ReportsService implements OnModuleInit {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Laporan Produksi IIoT');
 
-    // Styling Header
+    // 1. Tambahkan Header Utama (Branding)
+    sheet.mergeCells('A1:F1');
+    const mainTitle = sheet.getCell('A1');
+    mainTitle.value = 'AQUA IIOT - INDUSTRIAL PRODUCTION REPORT';
+    mainTitle.font = { name: 'Arial Black', size: 16, color: { argb: 'FFFFFFFF' } };
+    mainTitle.alignment = { vertical: 'middle', horizontal: 'center' };
+    mainTitle.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF1F4E78' } // Biru Gelap Professional
+    };
+    sheet.getRow(1).height = 40;
+
+    // 2. Definisi Kolom & Header Tabel
     sheet.columns = [
-      { header: 'No', key: 'no', width: 5 },
-      { header: 'Waktu Sinyal', key: 'time', width: 25 },
-      { header: 'Nama Mesin', key: 'name', width: 20 },
-      { header: 'Counter Produksi', key: 'count', width: 15 },
-      { header: 'Suhu (°C)', key: 'temp', width: 12 },
-      { header: 'Status Operasional', key: 'status', width: 15 },
+      { header: 'NO', key: 'no', width: 8 },
+      { header: 'WAKTU SINYAL', key: 'time', width: 30 },
+      { header: 'NAMA MESIN', key: 'name', width: 25 },
+      { header: 'COUNTER PRODUKSI', key: 'count', width: 20 },
+      { header: 'SUHU (°C)', key: 'temp', width: 15 },
+      { header: 'STATUS OPERASIONAL', key: 'status', width: 25 },
     ];
 
-    sheet.getRow(1).font = { bold: true };
-    sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+    // Styling Header Tabel (Baris ke-2)
+    const headerRow = sheet.getRow(2);
+    headerRow.height = 25;
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF2E75B6' } // Biru Terang
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
 
-    // Inject Data
+    // 3. Inject Data
     logs.forEach((log, index) => {
-      sheet.addRow({
+      const row = sheet.addRow({
         no: index + 1,
         time: log.createdAt.toLocaleString('id-ID'),
         name: log.machine?.name || 'Unknown',
         count: log.counterValue,
-        temp: log.temperature,
-        status: log.status === 1 ? 'RUNNING' : 'STOP/ALARM',
+        temp: `${log.temperature}°C`,
+        status: log.status === 1 ? '✅ RUNNING' : '🚨 STOP/ALARM',
       });
-    });
 
-    // Colorize status
-    sheet.eachRow((row, rowNumber) => {
-      if (rowNumber > 1) {
-        const statusCell = row.getCell(6);
-        if (statusCell.value === 'STOP/ALARM') {
-          statusCell.font = { color: { argb: 'FFFF0000' }, bold: true };
-        } else {
-          statusCell.font = { color: { argb: 'FF008000' } };
-        }
+      // Styling Baris Data (Zebra Cross & Alignment)
+      row.alignment = { vertical: 'middle', horizontal: 'center' };
+
+      // Warna selang-seling (abu-abu muda banget)
+      if (index % 2 === 0) {
+        row.eachCell((cell) => {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFF9F9F9' }
+          };
+        });
+      }
+
+      // Border untuk setiap cell data
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+          left: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+          bottom: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+          right: { style: 'thin', color: { argb: 'FFD9D9D9' } }
+        };
+      });
+
+      // 4. Colorize Status Cell Spesifik
+      const statusCell = row.getCell(6);
+      if (log.status === 1) {
+        statusCell.font = { color: { argb: 'FF008000' }, bold: true }; // Hijau
+      } else {
+        statusCell.font = { color: { argb: 'FFFF0000' }, bold: true }; // Merah
+        statusCell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFE6E6' } // Background merah muda tipis kalo error
+        };
       }
     });
 
+    // 5. Simpan atau Kirim Buffer
     if (filePath) {
       await workbook.xlsx.writeFile(filePath);
       return filePath;
     }
-    // writeBuffer() returns ArrayBuffer — must convert to Buffer properly
+
     const arrayBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(arrayBuffer);
   }
@@ -218,10 +272,11 @@ export class ReportsService implements OnModuleInit {
     filePath: string | null,
   ): Promise<Buffer | string> {
     return new Promise((resolve, reject) => {
-      const doc = new PDFDocument({ size: 'A4', margin: 50 });
+      // Gunakan margin yang konsisten
+      const doc = new PDFDocument({ size: 'A4', margin: 40 });
       const buffers: Buffer[] = [];
 
-      // ── Setup output BEFORE writing any content ──────────────────────────
+      // ── Setup Output ──────────────────────────────────────────────────────
       if (filePath) {
         const stream = fs.createWriteStream(filePath);
         doc.pipe(stream);
@@ -229,63 +284,82 @@ export class ReportsService implements OnModuleInit {
         stream.on('finish', () => resolve(filePath));
         stream.on('error', reject);
       } else {
-        // Must be attached before doc.end() so no chunk is missed
         doc.on('data', (chunk: Buffer) => buffers.push(chunk));
         doc.on('end', () => resolve(Buffer.concat(buffers)));
         doc.on('error', reject);
       }
 
+      // ── Helper: Header Tabel (Biar bisa dipanggil tiap ganti halaman) ──────
+      const drawTableHeader = (y: number) => {
+        doc.rect(40, y - 5, 515, 20).fill('#2c3e50'); // Background header
+        doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9);
+
+        doc.text('No', 45, y);
+        doc.text('Waktu (WIB)', 75, y);
+        doc.text('Nama Mesin', 215, y);
+        doc.text('Counter', 360, y, { width: 60, align: 'center' });
+        doc.text('Suhu', 440, y, { width: 40, align: 'center' });
+        doc.text('Status', 500, y, { width: 50, align: 'center' });
+
+        return y + 20; // Kembalikan posisi Y setelah header
+      };
+
       // ── PDF Content ──────────────────────────────────────────────────────
-      doc
-        .fillColor('#2c3e50')
-        .fontSize(20)
-        .text('AQUA IIOT PRODUCTION REPORT', { align: 'center' });
-      doc.fontSize(10).text(`Periode: ${new Date().toLocaleDateString('id-ID')}`, {
-        align: 'center',
-      });
-      doc.moveDown();
-      doc.moveTo(50, 100).lineTo(550, 100).stroke();
-      doc.moveDown();
+      // Title Branding
+      doc.fillColor('#2c3e50').fontSize(18).font('Helvetica-Bold')
+        .text('AQUA IIOT PRODUCTION REPORT', { align: 'left' });
 
-      // Table Header
-      const tableTop = 130;
-      doc.fontSize(10).font('Helvetica-Bold');
-      doc.text('No', 50, tableTop);
-      doc.text('Timestamp', 80, tableTop);
-      doc.text('Mesin', 230, tableTop);
-      doc.text('Counter', 350, tableTop);
-      doc.text('Temp', 430, tableTop);
-      doc.text('Status', 500, tableTop);
-      doc.font('Helvetica');
+      doc.fontSize(9).font('Helvetica').fillColor('#7f8c8d')
+        .text(`Generated on: ${new Date().toLocaleString('id-ID')}`, { align: 'left' });
+      doc.moveDown(2);
 
-      let currentY = tableTop + 20;
+      let currentY = doc.y;
+      currentY = drawTableHeader(currentY);
 
-      // Table Rows
+      // ── Table Rows ──────────────────────────────────────────────────────
       logs.forEach((log, i) => {
+        // Check if we need a new page (halaman baru)
         if (currentY > 750) {
           doc.addPage();
           currentY = 50;
+          currentY = drawTableHeader(currentY);
         }
 
-        doc.fontSize(8);
-        doc.text((i + 1).toString(), 50, currentY);
-        doc.text(log.createdAt.toISOString(), 80, currentY);
-        doc.text(log.machine?.name || 'N/A', 230, currentY);
-        doc.text(log.counterValue.toString(), 350, currentY);
-        doc.text(`${log.temperature}°C`, 430, currentY);
-        doc.text(log.status === 1 ? 'RUN' : 'STOP', 500, currentY);
+        // Zebra striping (warna selang-seling tipis)
+        if (i % 2 === 0) {
+          doc.rect(40, currentY - 2, 515, 15).fill('#f9f9f9');
+        }
 
+        doc.fillColor('#2c3e50').font('Helvetica').fontSize(8);
+
+        // Data Columns
+        doc.text((i + 1).toString(), 45, currentY);
+        doc.text(new Date(log.createdAt).toLocaleString('id-ID'), 75, currentY);
+        doc.text(log.machine?.name?.substring(0, 25) || 'N/A', 215, currentY);
+        doc.text(log.counterValue.toString(), 360, currentY, { width: 60, align: 'center' });
+        doc.text(`${log.temperature}°C`, 440, currentY, { width: 40, align: 'center' });
+
+        // Status dengan warna & posisi aman
+        const statusText = log.status === 1 ? 'RUNNING' : 'STOPPED';
+        const statusColor = log.status === 1 ? '#27ae60' : '#e74c3c';
+
+        doc.fillColor(statusColor).font('Helvetica-Bold')
+          .text(statusText, 500, currentY, { width: 50, align: 'center' });
+
+        // Border bawah tipis
         currentY += 15;
-        doc
-          .moveTo(50, currentY - 2)
-          .lineTo(550, currentY - 2)
-          .strokeColor('#ecf0f1')
-          .lineWidth(0.5)
-          .stroke()
-          .strokeColor('#000');
+        doc.moveTo(40, currentY - 2).lineTo(555, currentY - 2)
+          .strokeColor('#eeeeee').lineWidth(0.5).stroke();
       });
 
-      // Finalize — triggers 'end' / 'finish' events
+      // Footer Page Number
+      const range = doc.bufferedPageRange();
+      for (let i = range.start; i < range.start + range.count; i++) {
+        doc.switchToPage(i);
+        doc.fillColor('#bdc3c7').fontSize(7)
+          .text(`Halaman ${i + 1} dari ${range.count}`, 40, 800, { align: 'center' });
+      }
+
       doc.end();
     });
   }
